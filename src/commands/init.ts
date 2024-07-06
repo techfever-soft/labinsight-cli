@@ -5,6 +5,9 @@ import { LabInsightDetector } from "../lib/classes/detector.class";
 
 const detector = new LabInsightDetector();
 
+/**
+ * Initialize a new .labinsight file
+ */
 export const init = async () => {
   console.log("Initializing a new .labinsight file...");
 

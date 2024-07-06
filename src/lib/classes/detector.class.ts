@@ -69,6 +69,48 @@ export class LabInsightDetector {
           enviroment: "development",
           port: 3100,
           host: "localhost",
+
+          srcFolder: "src",
+          distFolder: "dist",
+
+          linting: "eslint",
+
+          rules: {
+            variableCasing: "camelCase",
+            maxLineLength: 120,
+            indentStyle: "space",
+            indentSize: 2,
+            allowTrailingSpaces: false,
+            enforceSemicolons: true,
+          },
+
+          options: {
+            jsDoc: true,
+            strictMode: true,
+            noConsoleLog: true,
+            noDebugger: true,
+            noUnusedVariables: true,
+            noUnusedImports: true,
+            noVar: true,
+          },
+
+          decorators: {
+            classDecorators: true,
+            methodDecorators: true,
+            propertyDecorators: true,
+            parameterDecorators: true,
+          },
+
+          checking: {
+            checkMethodNames: true,
+            checkPropertyNames: true,
+            checkParameterNames: true,
+            checkClassNames: true,
+            checkInterfaceNames: true,
+            checkEnumNames: true,
+            checkFunctionNames: true,
+            checkVariableNames: true,
+          },
         });
       } else {
         resolve(<LabInsightConfig>{
@@ -79,6 +121,48 @@ export class LabInsightDetector {
           enviroment: "development",
           port: 3100,
           host: "localhost",
+
+          srcFolder: "src",
+          distFolder: "dist",
+
+          linting: "eslint",
+
+          rules: {
+            variableCasing: "camelCase",
+            maxLineLength: 120,
+            indentStyle: "space",
+            indentSize: 2,
+            allowTrailingSpaces: false,
+            enforceSemicolons: true,
+          },
+
+          options: {
+            jsDoc: true,
+            strictMode: true,
+            noConsoleLog: true,
+            noDebugger: true,
+            noUnusedVariables: true,
+            noUnusedImports: true,
+            noVar: true,
+          },
+
+          decorators: {
+            classDecorators: true,
+            methodDecorators: true,
+            propertyDecorators: true,
+            parameterDecorators: true,
+          },
+
+          checking: {
+            checkMethodNames: true,
+            checkPropertyNames: true,
+            checkParameterNames: true,
+            checkClassNames: true,
+            checkInterfaceNames: true,
+            checkEnumNames: true,
+            checkFunctionNames: true,
+            checkVariableNames: true,
+          },
         });
       }
     });
@@ -112,10 +196,7 @@ export class LabInsightDetector {
     const itemPath = path.join(process.cwd(), name);
 
     try {
-      const exists = await fs.promises
-        .access(itemPath, fs.constants.F_OK)
-        .then(() => true)
-        .catch(() => false);
+      const exists = fs.existsSync(itemPath);
 
       if (!exists) {
         return;

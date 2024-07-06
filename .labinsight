@@ -1,9 +1,45 @@
 {
   "version": 1,
-  "projectName": "cli",
-  "projectType": "other",
+  "projectName": "@techfever/labinsight-cli",
+  "projectType": "none",
   "engine": "none",
   "enviroment": "development",
   "port": 3100,
-  "host": "localhost"
+  "host": "localhost",
+  "srcFolder": "src",
+  "distFolder": "dist",
+  "linting": "eslint",
+  "rules": {
+    "variableCasing": "camelCase",
+    "maxLineLength": 120,
+    "indentStyle": "space",
+    "indentSize": 2,
+    "allowTrailingSpaces": false,
+    "enforceSemicolons": true
+  },
+  "options": {
+    "jsDoc": true,
+    "strictMode": true,
+    "noConsoleLog": true,
+    "noDebugger": true,
+    "noUnusedVariables": true,
+    "noUnusedImports": true,
+    "noVar": true
+  },
+  "decorators": {
+    "classDecorators": true,
+    "methodDecorators": true,
+    "propertyDecorators": true,
+    "parameterDecorators": true
+  },
+  "checking": {
+    "checkMethodNames": true,
+    "checkPropertyNames": true,
+    "checkParameterNames": true,
+    "checkClassNames": true,
+    "checkInterfaceNames": true,
+    "checkEnumNames": true,
+    "checkFunctionNames": true,
+    "checkVariableNames": true
+  }
 }

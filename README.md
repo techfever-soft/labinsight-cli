@@ -7,7 +7,12 @@ A static code analysis tool designed to provide insights and improve the quality
 - [x] Project structure exploration
 - [x] Automatic project type detection (Node.js, Angular, React, etc.)
 - [x] Custom configuration file '.labinsight'
-- [ ] Basic code analysis for common errors
+- [x] Basic code analysis for common errors
+  - [ ] Rules
+  - [ ] Casing
+  - [ ] Options
+  - [ ] Checking
+  - [ ] Decorators
 - [ ] Deep code analysis for error detection
 - [ ] Coding conventions validation (linting)
 - [ ] Detailed reports generation (JSON, HTML, XML...)

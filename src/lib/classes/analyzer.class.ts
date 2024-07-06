@@ -1,8 +1,15 @@
+import {
+  checkCamelCaseForFunctions,
+  checkCamelCaseForVariables,
+} from "./validators/casing/camelCase";
+
+import { LabInsightConfig } from "../interfaces/config.interface";
+import chalk from "chalk";
 import fs from "fs";
 import path from "path";
 
 export class LabInsightAnalyzer {
-  public ignoredDirectories = ["node_modules", ".git"];
+  public ignoredDirectories = ["node_modules", ".git", "dist"];
 
   constructor() {}
 
@@ -54,7 +61,9 @@ export class LabInsightAnalyzer {
   private async analyzeFile(filePath: string): Promise<void> {
     try {
       const fileContent = fs.readFileSync(filePath, "utf-8");
-      console.log(`Analyzing file: ${filePath}`);
+      const labInsightConfig: LabInsightConfig = JSON.parse(
+        fs.readFileSync(path.join(".labinsight"), "utf-8")
+      );
 
       // Perform various analyses
       const { fileType, isSourceCode } = await this.detectFileType(
@@ -62,31 +71,30 @@ export class LabInsightAnalyzer {
         fileContent
       );
 
-      console.log(`File Type: ${fileType}`);
+      console.log(
+        chalk.grey(`Analyzing file : ${chalk.italic(filePath)} [${fileType}]`)
+      );
 
       if (isSourceCode) {
-        const camelCase = await this.detectCamelCase(fileContent);
-        // const snakeCase = await this.detectSnakeCase(fileContent);
-        // const kebabCase = await this.detectKebabCase(fileContent);
-        // const upperCase = await this.detectUpperCase(fileContent);
-        // const pascalCase = await this.detectPascalCase(fileContent);
+        if (labInsightConfig.rules.variableCasing === "camelCase") {
+          /**
+           * SECTION: Casing analysis
+           */
+          await checkCamelCaseForVariables(filePath, fileContent);
+          // await checkCamelCaseForFunctions(filePath, fileContent);
+          // TODO: Implement the rest of the casing checks
 
-        console.log(`Camel Case: ${camelCase}`);
-        // console.log(`Snake Case: ${snakeCase}`);
-        // console.log(`Kebab Case: ${kebabCase}`);
-        // console.log(`Upper Case: ${upperCase}`);
-        // console.log(`Pascal Case: ${pascalCase}`);
+          /**
+           * SECTION: Rules analysis
+           */
+          // TODO: Implement the rules analysis
+        }
       }
+
+      console.log(" ");
     } catch (error) {
       console.error(`Error analyzing file ${filePath}: ${error}`);
     }
-  }
-
-  private async detectCamelCase(fileContent: string): Promise<boolean> {
-    const camelCasePattern = /\b[a-z][a-zA-Z0-9]*([A-Z][a-zA-Z0-9]*)+\b/g;
-    const variableNames = fileContent.match(camelCasePattern) || [];
-
-    return variableNames.length > 0;
   }
 
   /**

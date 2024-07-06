@@ -7,16 +7,26 @@ import { program } from "commander";
 
 program.version("0.1.0");
 
+/**
+ * Initialize a new .labinsight file
+ */
 program
   .command("init")
   .description("Initialize a new .labinsight file")
   .action(init);
 
-program
-  .command("explore")
-  .description("Explores the project to generate a report")
-  .action(explore);
+/**
+ * Explore the project root
+ * @deprecated
+ */
+// program
+//   .command("explore")
+//   .description("Explores the project to generate a report")
+//   .action(explore);
 
+/**
+ * Analyze the project basically
+ */
 program
   .command("analyze")
   .description("Basic analysis of the project files")
