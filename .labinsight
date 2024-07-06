@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "projectName": "cli",
+  "projectType": "other",
+  "engine": "none",
+  "enviroment": "development",
+  "port": 3100,
+  "host": "localhost"
+}
