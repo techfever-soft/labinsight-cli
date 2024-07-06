@@ -1,6 +1,6 @@
 {
   "name": "@techfever/labinsight-cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A smart code analysis tool for all your projects",
   "main": "dist/bin/labinsight.js",
   "scripts": {
@@ -29,6 +29,5 @@
     "chalk": "^4.1.2",
     "ora": "^5.4.1",
     "@inquirer/prompts": "5.1.2"
-  
   }
 }
