@@ -5,7 +5,7 @@ import { explore } from "../src/commands/explore";
 import { init } from "../src/commands/init";
 import { program } from "commander";
 
-program.version("0.1.0");
+program.version("0.1.1");
 
 /**
  * Initialize a new .labinsight file
