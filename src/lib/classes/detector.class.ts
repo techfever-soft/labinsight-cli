@@ -75,14 +75,6 @@ export class LabInsightDetector {
 
           linting: "eslint",
 
-          rules: {
-            maxLineLength: 120,
-            indentStyle: "space",
-            indentSize: 2,
-            allowTrailingSpaces: false,
-            enforceSemicolons: true,
-          },
-
           casing: {
             variableCasing: "camelCase",
             parameterCasing: "camelCase",
@@ -96,20 +88,14 @@ export class LabInsightDetector {
 
           options: {
             jsDoc: true,
+            silent: true,
             strictMode: true,
             noConsoleLog: true,
-            noImplicitAny: true,
+            noAny: true,
             noDebugger: true,
             noUnusedVariables: true,
             noUnusedImports: true,
             noVar: true,
-          },
-
-          decorators: {
-            classDecorators: true,
-            methodDecorators: true,
-            propertyDecorators: true,
-            parameterDecorators: true,
           },
         });
       } else {
@@ -127,14 +113,6 @@ export class LabInsightDetector {
 
           linting: "eslint",
 
-          rules: {
-            maxLineLength: 120,
-            indentStyle: "space",
-            indentSize: 2,
-            allowTrailingSpaces: false,
-            enforceSemicolons: true,
-          },
-
           casing: {
             variableCasing: "camelCase",
             parameterCasing: "camelCase",
@@ -148,20 +126,14 @@ export class LabInsightDetector {
 
           options: {
             jsDoc: true,
+            silent: true,
             strictMode: true,
-            noImplicitAny: true,
+            noAny: true,
             noConsoleLog: true,
             noDebugger: true,
             noUnusedVariables: true,
             noUnusedImports: true,
             noVar: true,
-          },
-
-          decorators: {
-            classDecorators: true,
-            methodDecorators: true,
-            propertyDecorators: true,
-            parameterDecorators: true,
           },
         });
       }
@@ -212,7 +184,7 @@ export class LabInsightDetector {
       } else if (stats.isFile()) {
         console.log(" ".repeat(depth * 2) + `└── 📄 ${name}`);
       } else {
-        console.log(" ".repeat(depth * 2) + `└── ${name} (type inconnu)`);
+        console.log(" ".repeat(depth * 2) + `└── ${name} (unknown type)`);
       }
     } catch (error) {
       console.error(`Error when reading : ${name} :`, error);

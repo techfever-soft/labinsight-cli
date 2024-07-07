@@ -9,13 +9,6 @@
   "srcFolder": "src",
   "distFolder": "dist",
   "linting": "eslint",
-  "rules": {
-    "maxLineLength": 120,
-    "indentStyle": "space",
-    "indentSize": 2,
-    "allowTrailingSpaces": false,
-    "enforceSemicolons": true
-  },
   "casing": {
     "variableCasing": "camelCase",
     "parameterCasing": "camelCase",
@@ -28,8 +21,9 @@
   },
   "options": {
     "jsDoc": true,
+    "silent": true,
     "strictMode": true,
-    "noImplicitAny": true,
+    "noAny": true,
     "noConsoleLog": true,
     "noDebugger": true,
     "noUnusedVariables": true,

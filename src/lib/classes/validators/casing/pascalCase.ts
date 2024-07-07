@@ -1,4 +1,11 @@
+import { LabInsightCore } from "../../core.class";
+import { LabInsightLogger } from "../../logger.class";
 import chalk from "chalk";
+
+const core = new LabInsightCore();
+const logger = new LabInsightLogger();
+
+const currentConfig = core.getConfig();
 
 /**
  * Checks if the variables are in PascalCase
@@ -33,16 +40,37 @@ export const checkPascalCaseForVariables = async (
       }
     }
 
-    console.log(
-      `✅ [PascalCase]${chalk.gray("[variable]")} ${chalk.green(
-        "Validated variables"
-      )} => ${chalk.bold(validatedVariablesCount)}`
-    );
-    console.log(
-      `❌ [PascalCase]${chalk.gray("[variable]")} ${chalk.red(
-        "Invalid variables"
-      )} => ${chalk.bold(invalidVariablesCount)}`
-    );
+    if (currentConfig.options.silent) {
+      if (validatedVariablesCount) {
+        logger.logChecking(
+          "check",
+          "pascalCase",
+          "variable",
+          `Validated variables => ${chalk.bold(validatedVariablesCount)}`
+        );
+      }
+      if (invalidVariablesCount) {
+        logger.logChecking(
+          "cross",
+          "pascalCase",
+          "variable",
+          `Invalid variables => ${chalk.bold(invalidVariablesCount)}`
+        );
+      }
+    } else {
+      logger.logChecking(
+        "check",
+        "pascalCase",
+        "variable",
+        `Validated variables => ${chalk.bold(validatedVariablesCount)}`
+      );
+      logger.logChecking(
+        "cross",
+        "pascalCase",
+        "variable",
+        `Invalid variables => ${chalk.bold(invalidVariablesCount)}`
+      );
+    }
 
     if (invalidVariablesCount && invalidVariables.length) {
       invalidVariables.forEach((variableState) => {
@@ -127,16 +155,48 @@ export const checkPascalCaseForFunctions = async (
     }
   }
 
-  console.log(
-    `✅ [PascalCase]${chalk.gray("[function]")} ${chalk.green(
-      "Validated functions"
-    )} => ${chalk.bold(validatedFunctionsCount)}`
-  );
-  console.log(
-    `❌ [PascalCase]${chalk.gray("[function]")} ${chalk.red(
-      "Invalid functions"
-    )} => ${chalk.bold(invalidFunctionsCount)}`
-  );
+  // console.log(
+  //   `✅ [PascalCase]${chalk.gray("[function]")} ${chalk.green(
+  //     "Validated functions"
+  //   )} => ${chalk.bold(validatedFunctionsCount)}`
+  // );
+  // console.log(
+  //   `❌ [PascalCase]${chalk.gray("[function]")} ${chalk.red(
+  //     "Invalid functions"
+  //   )} => ${chalk.bold(invalidFunctionsCount)}`
+  // );
+
+  if (currentConfig.options.silent) {
+    if (validatedFunctionsCount) {
+      logger.logChecking(
+        "check",
+        "pascalCase",
+        "method",
+        `Validated functions => ${chalk.bold(validatedFunctionsCount)}`
+      );
+    }
+    if (invalidFunctionsCount) {
+      logger.logChecking(
+        "cross",
+        "pascalCase",
+        "method",
+        `Invalid functions => ${chalk.bold(invalidFunctionsCount)}`
+      );
+    }
+  } else {
+    logger.logChecking(
+      "check",
+      "pascalCase",
+      "method",
+      `Validated functions => ${chalk.bold(validatedFunctionsCount)}`
+    );
+    logger.logChecking(
+      "cross",
+      "pascalCase",
+      "method",
+      `Invalid functions => ${chalk.bold(invalidFunctions)}`
+    );
+  }
 
   if (invalidFunctionsCount && invalidFunctions.length) {
     invalidFunctions.forEach((funcState) => {
@@ -182,16 +242,48 @@ export const checkPascalCaseForClasses = async (
     }
   }
 
-  console.log(
-    `✅ [PascalCase]${chalk.gray("[class]")} ${chalk.green(
-      "Validated classes"
-    )} => ${chalk.bold(validatedClassesCount)}`
-  );
-  console.log(
-    `❌ [PascalCase]${chalk.gray("[class]")} ${chalk.red(
-      "Invalid classes"
-    )} => ${chalk.bold(invalidClassesCount)}`
-  );
+  // console.log(
+  //   `✅ [PascalCase]${chalk.gray("[class]")} ${chalk.green(
+  //     "Validated classes"
+  //   )} => ${chalk.bold(validatedClassesCount)}`
+  // );
+  // console.log(
+  //   `❌ [PascalCase]${chalk.gray("[class]")} ${chalk.red(
+  //     "Invalid classes"
+  //   )} => ${chalk.bold(invalidClassesCount)}`
+  // );
+
+  if (currentConfig.options.silent) {
+    if (validatedClassesCount) {
+      logger.logChecking(
+        "check",
+        "pascalCase",
+        "class",
+        `Validated classes => ${chalk.bold(validatedClassesCount)}`
+      );
+    }
+    if (invalidClassesCount) {
+      logger.logChecking(
+        "cross",
+        "pascalCase",
+        "class",
+        `Invalid classes => ${chalk.bold(invalidClassesCount)}`
+      );
+    }
+  } else {
+    logger.logChecking(
+      "check",
+      "pascalCase",
+      "class",
+      `Validated classes => ${chalk.bold(validatedClassesCount)}`
+    );
+    logger.logChecking(
+      "cross",
+      "pascalCase",
+      "class",
+      `Invalid classes => ${chalk.bold(invalidClassesCount)}`
+    );
+  }
 
   if (invalidClassesCount && invalidClasses.length) {
     invalidClasses.forEach((classState) => {
@@ -238,16 +330,48 @@ export const checkPascalCaseForProperties = async (
     }
   }
 
-  console.log(
-    `✅ [PascalCase]${chalk.gray("[property]")} ${chalk.green(
-      "Validated properties"
-    )} => ${chalk.bold(validatedPropertiesCount)}`
-  );
-  console.log(
-    `❌ [PascalCase]${chalk.gray("[property]")} ${chalk.red(
-      "Invalid properties"
-    )} => ${chalk.bold(invalidPropertiesCount)}`
-  );
+  // console.log(
+  //   `✅ [PascalCase]${chalk.gray("[property]")} ${chalk.green(
+  //     "Validated properties"
+  //   )} => ${chalk.bold(validatedPropertiesCount)}`
+  // );
+  // console.log(
+  //   `❌ [PascalCase]${chalk.gray("[property]")} ${chalk.red(
+  //     "Invalid properties"
+  //   )} => ${chalk.bold(invalidPropertiesCount)}`
+  // );
+
+  if (currentConfig.options.silent) {
+    if (validatedPropertiesCount) {
+      logger.logChecking(
+        "check",
+        "pascalCase",
+        "property",
+        `Validated properties => ${chalk.bold(validatedPropertiesCount)}`
+      );
+    }
+    if (invalidPropertiesCount) {
+      logger.logChecking(
+        "cross",
+        "pascalCase",
+        "property",
+        `Invalid properties => ${chalk.bold(invalidPropertiesCount)}`
+      );
+    }
+  } else {
+    logger.logChecking(
+      "check",
+      "pascalCase",
+      "property",
+      `Validated properties => ${chalk.bold(validatedPropertiesCount)}`
+    );
+    logger.logChecking(
+      "cross",
+      "pascalCase",
+      "property",
+      `Invalid properties => ${chalk.bold(invalidPropertiesCount)}`
+    );
+  }
 
   if (invalidPropertiesCount && invalidProperties.length) {
     invalidProperties.forEach((propertyState) => {
@@ -301,16 +425,48 @@ export const checkPascalCaseForParameters = async (
     }
   }
 
-  console.log(
-    `✅ [PascalCase]${chalk.gray("[parameter]")} ${chalk.green(
-      "Validated parameters"
-    )} => ${chalk.bold(validatedParametersCount)}`
-  );
-  console.log(
-    `❌ [PascalCase]${chalk.gray("[parameter]")} ${chalk.red(
-      "Invalid parameters"
-    )} => ${chalk.bold(invalidParametersCount)}`
-  );
+  // console.log(
+  //   `✅ [PascalCase]${chalk.gray("[parameter]")} ${chalk.green(
+  //     "Validated parameters"
+  //   )} => ${chalk.bold(validatedParametersCount)}`
+  // );
+  // console.log(
+  //   `❌ [PascalCase]${chalk.gray("[parameter]")} ${chalk.red(
+  //     "Invalid parameters"
+  //   )} => ${chalk.bold(invalidParametersCount)}`
+  // );
+
+  if (currentConfig.options.silent) {
+    if (validatedParametersCount) {
+      logger.logChecking(
+        "check",
+        "pascalCase",
+        "parameter",
+        `Validated parameters => ${chalk.bold(validatedParametersCount)}`
+      );
+    }
+    if (invalidParametersCount) {
+      logger.logChecking(
+        "cross",
+        "pascalCase",
+        "parameter",
+        `Invalid parameters => ${chalk.bold(invalidParametersCount)}`
+      );
+    }
+  } else {
+    logger.logChecking(
+      "check",
+      "pascalCase",
+      "parameter",
+      `Validated parameters => ${chalk.bold(validatedParametersCount)}`
+    );
+    logger.logChecking(
+      "cross",
+      "pascalCase",
+      "parameter",
+      `Invalid parameters => ${chalk.bold(invalidParametersCount)}`
+    );
+  }
 
   if (invalidParametersCount && invalidParameters.length) {
     invalidParameters.forEach((parameterState) => {
@@ -329,7 +485,7 @@ export const checkPascalCaseForParameters = async (
 
 export const checkPascalCaseForTypes = async (
   filePath: string,
-  fileContent: string,
+  fileContent: string
 ) => {
   let validatedTypesCount = 0;
   let invalidTypesCount = 0;
@@ -356,16 +512,48 @@ export const checkPascalCaseForTypes = async (
     }
   }
 
-  console.log(
-    `✅ [PascalCase]${chalk.gray("[type]")} ${chalk.green(
-      "Validated types"
-    )} => ${chalk.bold(validatedTypesCount)}`
-  );
-  console.log(
-    `❌ [PascalCase]${chalk.gray("[type]")} ${chalk.red(
-      "Invalid types"
-    )} => ${chalk.bold(invalidTypesCount)}`
-  );
+  // console.log(
+  //   `✅ [PascalCase]${chalk.gray("[type]")} ${chalk.green(
+  //     "Validated types"
+  //   )} => ${chalk.bold(validatedTypesCount)}`
+  // );
+  // console.log(
+  //   `❌ [PascalCase]${chalk.gray("[type]")} ${chalk.red(
+  //     "Invalid types"
+  //   )} => ${chalk.bold(invalidTypesCount)}`
+  // );
+
+  if (currentConfig.options.silent) {
+    if (validatedTypesCount) {
+      logger.logChecking(
+        "check",
+        "pascalCase",
+        "type",
+        `Validated types => ${chalk.bold(validatedTypesCount)}`
+      );
+    }
+    if (invalidTypesCount) {
+      logger.logChecking(
+        "cross",
+        "pascalCase",
+        "type",
+        `Invalid types => ${chalk.bold(invalidTypesCount)}`
+      );
+    }
+  } else {
+    logger.logChecking(
+      "check",
+      "pascalCase",
+      "type",
+      `Validated types => ${chalk.bold(validatedTypesCount)}`
+    );
+    logger.logChecking(
+      "cross",
+      "pascalCase",
+      "type",
+      `Invalid types => ${chalk.bold(invalidTypesCount)}`
+    );
+  }
 
   if (invalidTypesCount && invalidTypes.length) {
     invalidTypes.forEach((typeState) => {
@@ -380,7 +568,7 @@ export const checkPascalCaseForTypes = async (
       );
     });
   }
-}
+};
 
 export const checkPascalCaseForInterfaces = async (
   filePath: string,
@@ -411,16 +599,48 @@ export const checkPascalCaseForInterfaces = async (
     }
   }
 
-  console.log(
-    `✅ [PascalCase]${chalk.gray("[interface]")} ${chalk.green(
-      "Validated interfaces"
-    )} => ${chalk.bold(validatedInterfacesCount)}`
-  );
-  console.log(
-    `❌ [PascalCase]${chalk.gray("[interface]")} ${chalk.red(
-      "Invalid interfaces"
-    )} => ${chalk.bold(invalidInterfacesCount)}`
-  );
+  // console.log(
+  //   `✅ [PascalCase]${chalk.gray("[interface]")} ${chalk.green(
+  //     "Validated interfaces"
+  //   )} => ${chalk.bold(validatedInterfacesCount)}`
+  // );
+  // console.log(
+  //   `❌ [PascalCase]${chalk.gray("[interface]")} ${chalk.red(
+  //     "Invalid interfaces"
+  //   )} => ${chalk.bold(invalidInterfacesCount)}`
+  // );
+
+  if (currentConfig.options.silent) {
+    if (validatedInterfacesCount) {
+      logger.logChecking(
+        "check",
+        "pascalCase",
+        "interface",
+        `Validated interfaces => ${chalk.bold(validatedInterfacesCount)}`
+      );
+    }
+    if (invalidInterfacesCount) {
+      logger.logChecking(
+        "cross",
+        "pascalCase",
+        "interface",
+        `Invalid interfaces => ${chalk.bold(invalidInterfacesCount)}`
+      );
+    }
+  } else {
+    logger.logChecking(
+      "check",
+      "pascalCase",
+      "interface",
+      `Validated interfaces => ${chalk.bold(validatedInterfacesCount)}`
+    );
+    logger.logChecking(
+      "cross",
+      "pascalCase",
+      "interface",
+      `Invalid interfaces => ${chalk.bold(invalidInterfacesCount)}`
+    );
+  }
 
   if (invalidInterfacesCount && invalidInterfaces.length) {
     invalidInterfaces.forEach((interfaceState) => {
@@ -466,16 +686,48 @@ export const checkPascalCaseForEnums = async (
     }
   }
 
-  console.log(
-    `✅ [PascalCase]${chalk.gray("[enum]")} ${chalk.green(
-      "Validated enums"
-    )} => ${chalk.bold(validatedEnumsCount)}`
-  );
-  console.log(
-    `❌ [PascalCase]${chalk.gray("[enum]")} ${chalk.red(
-      "Invalid enums"
-    )} => ${chalk.bold(invalidEnumsCount)}`
-  );
+  // console.log(
+  //   `✅ [PascalCase]${chalk.gray("[enum]")} ${chalk.green(
+  //     "Validated enums"
+  //   )} => ${chalk.bold(validatedEnumsCount)}`
+  // );
+  // console.log(
+  //   `❌ [PascalCase]${chalk.gray("[enum]")} ${chalk.red(
+  //     "Invalid enums"
+  //   )} => ${chalk.bold(invalidEnumsCount)}`
+  // );
+
+  if (currentConfig.options.silent) {
+    if (validatedEnumsCount) {
+      logger.logChecking(
+        "check",
+        "pascalCase",
+        "enum",
+        `Validated enums => ${chalk.bold(validatedEnumsCount)}`
+      );
+    }
+    if (invalidEnumsCount) {
+      logger.logChecking(
+        "cross",
+        "pascalCase",
+        "enum",
+        `Invalid enums => ${chalk.bold(invalidEnumsCount)}`
+      );
+    }
+  } else {
+    logger.logChecking(
+      "check",
+      "pascalCase",
+      "enum",
+      `Validated enums => ${chalk.bold(validatedEnumsCount)}`
+    );
+    logger.logChecking(
+      "cross",
+      "pascalCase",
+      "enum",
+      `Invalid enums => ${chalk.bold(invalidEnumsCount)}`
+    );
+  }
 
   if (invalidEnumsCount && invalidEnums.length) {
     invalidEnums.forEach((enumState) => {

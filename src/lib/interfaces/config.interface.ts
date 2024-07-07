@@ -5,7 +5,7 @@ import {
   LabInsignhtProjectLinting,
 } from "../types/project.type";
 
-import { LabInsightEnvironment } from "../types/environment";
+import { LabInsightEnvironment } from "../types/environment.type";
 
 export interface LabInsightConfig {
   version: number;
@@ -21,14 +21,6 @@ export interface LabInsightConfig {
 
   linting: LabInsignhtProjectLinting;
 
-  rules: {
-    maxLineLength: number;
-    indentStyle: "space" | "tab";
-    indentSize: number;
-    allowTrailingSpaces: boolean;
-    enforceSemicolons: boolean;
-  };
-
   casing: {
     variableCasing: LabInsightProjectCasing;
     parameterCasing: LabInsightProjectCasing;
@@ -42,19 +34,13 @@ export interface LabInsightConfig {
 
   options: {
     jsDoc: boolean;
+    silent: boolean;
     strictMode: boolean;
-    noImplicitAny: boolean;
+    noAny: boolean;
     noConsoleLog: boolean;
     noDebugger: boolean;
     noUnusedVariables: boolean;
     noUnusedImports: boolean;
     noVar: boolean;
-  };
-
-  decorators: {
-    classDecorators: boolean;
-    methodDecorators: boolean;
-    propertyDecorators: boolean;
-    parameterDecorators: boolean;
   };
 }

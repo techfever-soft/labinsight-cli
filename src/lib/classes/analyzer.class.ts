@@ -18,11 +18,18 @@ import {
   checkPascalCaseForTypes,
   checkPascalCaseForVariables,
 } from "./validators/casing/pascalCase";
+import {
+  doFileContainsIgnoreCasingDecorator,
+  ignoreCasing,
+} from "../decorators/ignore.decorator";
 
 import { LabInsightConfig } from "../interfaces/config.interface";
+import { LabInsightLogger } from "./logger.class";
 import chalk from "chalk";
 import fs from "fs";
 import path from "path";
+
+const logger = new LabInsightLogger();
 
 export class LabInsightAnalyzer {
   public ignoredDirectories = ["node_modules", ".git", "dist"];
@@ -34,7 +41,7 @@ export class LabInsightAnalyzer {
    * @returns Promise<void>
    */
   public async basicAnalysis(): Promise<void> {
-    console.log("Starting basic analysis...");
+    logger.log("info", "Starting basic analysis...");
 
     const cwd = process.cwd();
     await this.analyzeDirectory(cwd);
@@ -65,11 +72,19 @@ export class LabInsightAnalyzer {
         }
       }
     } catch (error) {
-      console.error(`Error reading directory ${directoryPath}: ${error}`);
+      logger.log(
+        "error",
+        `Error analyzing directory ${directoryPath}: ${error}`
+      );
     }
   }
 
-  private async removeCommentsAndStrings(fileContent: string) {
+  /**
+   * Removes comments and strings from a file content
+   * @param fileContent string
+   * @returns Promise<string>
+   */
+  private async removeCommentsAndStrings(fileContent: string): Promise<string> {
     const commentPattern = /\/\/.*|\/\*[^]*?\*\//g;
     const stringPattern = /(['"`])(?:(?=(\\?))\2.)*?\1/g;
     return fileContent.replace(commentPattern, "").replace(stringPattern, "");
@@ -88,6 +103,8 @@ export class LabInsightAnalyzer {
       );
 
       const fileContent = await this.removeCommentsAndStrings(rawfileContent);
+      const hasIgnoreCasingDecorator =
+        doFileContainsIgnoreCasingDecorator(fileContent);
 
       // Perform various analyses
       const { fileType, isSourceCode } = await this.detectFileType(
@@ -95,8 +112,9 @@ export class LabInsightAnalyzer {
         fileContent
       );
 
-      console.log(
-        chalk.grey(`Analyzing file : ${chalk.italic(filePath)} [${fileType}]`)
+      logger.log(
+        "info",
+        `Analyzing file : ${chalk.gray(chalk.italic(filePath))} [${fileType}]`
       );
 
       if (isSourceCode) {
@@ -104,60 +122,67 @@ export class LabInsightAnalyzer {
          * SECTION: Casing analysis
          */
 
-        //
-        // camelCase
-        //
-        if (labInsightConfig.casing.variableCasing === "camelCase") {
-          await checkCamelCaseForVariables(filePath, fileContent);
-        }
-        if (labInsightConfig.casing.methodCasing === "camelCase") {
-          await checkCamelCaseForFunctions(filePath, fileContent);
-        }
-        if (labInsightConfig.casing.classCasing === "camelCase") {
-          await checkCamelCaseForClasses(filePath, fileContent);
-        }
-        if (labInsightConfig.casing.propertyCasing === "camelCase") {
-          await checkCamelCaseForProperties(filePath, fileContent);
-        }
-        if (labInsightConfig.casing.parameterCasing === "camelCase") {
-          await checkCamelCaseForParameters(filePath, fileContent);
-        }
-        if (labInsightConfig.casing.typeCasing === "camelCase") {
-          await checkCamelCaseForTypes(filePath, fileContent);
-        }
-        if (labInsightConfig.casing.interfaceCasing === "camelCase") {
-          await checkCamelCaseForInterfaces(filePath, fileContent);
-        }
-        if (labInsightConfig.casing.enumCasing === "camelCase") {
-          await checkCamelCaseForEnums(filePath, fileContent);
-        }
+        if (!hasIgnoreCasingDecorator) {
+          //
+          // camelCase
+          //
+          if (labInsightConfig.casing.variableCasing === "camelCase") {
+            await checkCamelCaseForVariables(filePath, fileContent);
+          }
+          if (labInsightConfig.casing.methodCasing === "camelCase") {
+            await checkCamelCaseForFunctions(filePath, fileContent);
+          }
+          if (labInsightConfig.casing.classCasing === "camelCase") {
+            await checkCamelCaseForClasses(filePath, fileContent);
+          }
+          if (labInsightConfig.casing.propertyCasing === "camelCase") {
+            await checkCamelCaseForProperties(filePath, fileContent);
+          }
+          if (labInsightConfig.casing.parameterCasing === "camelCase") {
+            await checkCamelCaseForParameters(filePath, fileContent);
+          }
+          if (labInsightConfig.casing.typeCasing === "camelCase") {
+            await checkCamelCaseForTypes(filePath, fileContent);
+          }
+          if (labInsightConfig.casing.interfaceCasing === "camelCase") {
+            await checkCamelCaseForInterfaces(filePath, fileContent);
+          }
+          if (labInsightConfig.casing.enumCasing === "camelCase") {
+            await checkCamelCaseForEnums(filePath, fileContent);
+          }
 
-        //
-        // PascalCase
-        //
-        if (labInsightConfig.casing.variableCasing === "pascalCase") {
-          await checkPascalCaseForVariables(filePath, fileContent);
-        }
-        if (labInsightConfig.casing.methodCasing === "pascalCase") {
-          await checkPascalCaseForFunctions(filePath, fileContent);
-        }
-        if (labInsightConfig.casing.classCasing === "pascalCase") {
-          await checkPascalCaseForClasses(filePath, fileContent);
-        }
-        if (labInsightConfig.casing.propertyCasing === "pascalCase") {
-          await checkPascalCaseForProperties(filePath, fileContent);
-        }
-        if (labInsightConfig.casing.parameterCasing === "pascalCase") {
-          await checkPascalCaseForParameters(filePath, fileContent);
-        }
-        if (labInsightConfig.casing.typeCasing === "pascalCase") {
-          await checkPascalCaseForTypes(filePath, fileContent);
-        }
-        if (labInsightConfig.casing.interfaceCasing === "pascalCase") {
-          await checkPascalCaseForInterfaces(filePath, fileContent);
-        }
-        if (labInsightConfig.casing.enumCasing === "pascalCase") {
-          await checkPascalCaseForEnums(filePath, fileContent);
+          //
+          // PascalCase
+          //
+          if (labInsightConfig.casing.variableCasing === "pascalCase") {
+            await checkPascalCaseForVariables(filePath, fileContent);
+          }
+          if (labInsightConfig.casing.methodCasing === "pascalCase") {
+            await checkPascalCaseForFunctions(filePath, fileContent);
+          }
+          if (labInsightConfig.casing.classCasing === "pascalCase") {
+            await checkPascalCaseForClasses(filePath, fileContent);
+          }
+          if (labInsightConfig.casing.propertyCasing === "pascalCase") {
+            await checkPascalCaseForProperties(filePath, fileContent);
+          }
+          if (labInsightConfig.casing.parameterCasing === "pascalCase") {
+            await checkPascalCaseForParameters(filePath, fileContent);
+          }
+          if (labInsightConfig.casing.typeCasing === "pascalCase") {
+            await checkPascalCaseForTypes(filePath, fileContent);
+          }
+          if (labInsightConfig.casing.interfaceCasing === "pascalCase") {
+            await checkPascalCaseForInterfaces(filePath, fileContent);
+          }
+          if (labInsightConfig.casing.enumCasing === "pascalCase") {
+            await checkPascalCaseForEnums(filePath, fileContent);
+          }
+        } else {
+          logger.log(
+            "warning",
+            "Ignoring case-checking for the file : " + filePath
+          );
         }
 
         //
@@ -190,15 +215,6 @@ export class LabInsightAnalyzer {
         }
 
         /**
-         * SECTION: Rules analysis
-         */
-        // await checkMaxLineLength(filePath, fileContent, labInsightConfig.rules.maxLineLength);
-        // await checkIndentStyle(filePath, fileContent, labInsightConfig.rules.indentStyle);
-        // await checkIndentSize(filePath, fileContent, labInsightConfig.rules.indentSize);
-        // await checkTrailingSpaces(filePath, fileContent, labInsightConfig.rules.allowTrailingSpaces);
-        // await checkSemicolons(filePath, fileContent, labInsightConfig.rules.enforceSemicolons);
-
-        /**
          * SECTION: Options analysis
          */
         // await checkJsDoc(filePath, fileContent, labInsightConfig.options.jsDoc);
@@ -209,19 +225,11 @@ export class LabInsightAnalyzer {
         // await checkNoUnusedVariables(filePath, fileContent, labInsightConfig.options.noUnusedVariables);
         // await checkNoUnusedImports(filePath, fileContent, labInsightConfig.options.noUnusedImports);
         // await checkNoVar(filePath, fileContent, labInsightConfig.options.noVar);
-
-        /**
-         * SECTION: Decorators analysis
-         */
-        // await checkClassDecorators(filePath, fileContent);
-        // await checkMethodDecorators(filePath, fileContent);
-        // await checkPropertyDecorators(filePath, fileContent);
-        // await checkParameterDecorators(filePath, fileContent);
       }
 
       console.log(" ");
     } catch (error) {
-      console.error(`Error analyzing file ${filePath}: ${error}`);
+      logger.log("error", `Error analyzing file ${filePath}: ${error}`);
     }
   }
 

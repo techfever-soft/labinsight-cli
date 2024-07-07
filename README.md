@@ -2,9 +2,9 @@
 
 A static code analysis tool designed to provide insights and improve the quality of web applications during development.
 
-### [Homepage](https://lab-insight.web.app)
+### [See official website](https://lab-insight.web.app)
 
-## Features
+## Features (v0.1+)
 
 - [x] Project structure exploration
 - [x] Automatic project type detection (Node.js, Angular, React, etc.)
@@ -14,15 +14,12 @@ A static code analysis tool designed to provide insights and improve the quality
     - [x] camelCase
     - [x] PascalCase
     - [ ] snake_case
-  - [ ] Rules
   - [ ] Options
-  - [ ] Checking
-  - [ ] Decorators
-- [ ] Deep code analysis for error detection
-- [ ] Coding conventions validation (linting)
+  - [x] Decorators (@IgnoreCasing)
+- [ ] Deep code analysis for common errors detection
 - [ ] Detailed reports generation (JSON, HTML, XML...)
 
-[See the roadmap for more features](ROADMAP.md)
+[See the roadmap for more features](https://github.com/techfever-soft/labinsight-cli/blob/main/ROADMAP.md)
 
 ## Installation
 

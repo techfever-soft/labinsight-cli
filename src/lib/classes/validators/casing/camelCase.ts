@@ -1,4 +1,12 @@
+import { LabInsightConfig } from "../../../interfaces/config.interface";
+import { LabInsightCore } from "../../core.class";
+import { LabInsightLogger } from "../../logger.class";
 import chalk from "chalk";
+
+const core = new LabInsightCore();
+const logger = new LabInsightLogger();
+
+const currentConfig = core.getConfig();
 
 /**
  * Checks if the variables are in camelCase
@@ -33,16 +41,37 @@ export const checkCamelCaseForVariables = async (
       }
     }
 
-    console.log(
-      `✅ [CamelCase]${chalk.gray("[variable]")} ${chalk.green(
-        "Validated variables"
-      )} => ${chalk.bold(validatedVariablesCount)}`
-    );
-    console.log(
-      `❌ [CamelCase]${chalk.gray("[variable]")} ${chalk.red(
-        "Invalid variables"
-      )} => ${chalk.bold(invalidVariablesCount)}`
-    );
+    if (currentConfig.options.silent) {
+      if (validatedVariablesCount) {
+        logger.logChecking(
+          "check",
+          "camelCase",
+          "variable",
+          `Validated variables => ${chalk.bold(validatedVariablesCount)}`
+        );
+      }
+      if (invalidVariablesCount) {
+        logger.logChecking(
+          "cross",
+          "camelCase",
+          "variable",
+          `Invalid variables => ${chalk.bold(invalidVariablesCount)}`
+        );
+      }
+    } else {
+      logger.logChecking(
+        "check",
+        "camelCase",
+        "variable",
+        `Validated variables => ${chalk.bold(validatedVariablesCount)}`
+      );
+      logger.logChecking(
+        "cross",
+        "camelCase",
+        "variable",
+        `Invalid variables => ${chalk.bold(invalidVariablesCount)}`
+      );
+    }
 
     if (invalidVariablesCount && invalidVariables.length) {
       invalidVariables.forEach((variableState) => {
@@ -131,16 +160,37 @@ export const checkCamelCaseForFunctions = async (
     }
   }
 
-  console.log(
-    `✅ [CamelCase]${chalk.gray("[function]")} ${chalk.green(
-      "Validated functions"
-    )} => ${chalk.bold(validatedFunctionsCount)}`
-  );
-  console.log(
-    `❌ [CamelCase]${chalk.gray("[function]")} ${chalk.red(
-      "Invalid functions"
-    )} => ${chalk.bold(invalidFunctionsCount)}`
-  );
+  if (currentConfig.options.silent) {
+    if (validatedFunctionsCount) {
+      logger.logChecking(
+        "check",
+        "camelCase",
+        "method",
+        `Validated methods => ${chalk.bold(validatedFunctionsCount)}`
+      );
+    }
+    if (invalidFunctionsCount) {
+      logger.logChecking(
+        "cross",
+        "camelCase",
+        "method",
+        `Invalid methods => ${chalk.bold(invalidFunctionsCount)}`
+      );
+    }
+  } else {
+    logger.logChecking(
+      "check",
+      "camelCase",
+      "method",
+      `Validated methods => ${chalk.bold(validatedFunctionsCount)}`
+    );
+    logger.logChecking(
+      "cross",
+      "camelCase",
+      "method",
+      `Invalid methods => ${chalk.bold(invalidFunctionsCount)}`
+    );
+  }
 
   if (invalidFunctionsCount && invalidFunctions.length) {
     invalidFunctions.forEach((funcState) => {
@@ -156,6 +206,8 @@ export const checkCamelCaseForFunctions = async (
     });
   }
 };
+
+// Do the same with logger.logChecking for the other functions
 
 export const checkCamelCaseForClasses = async (
   filePath: string,
@@ -186,16 +238,37 @@ export const checkCamelCaseForClasses = async (
     }
   }
 
-  console.log(
-    `✅ [CamelCase]${chalk.gray("[class]")} ${chalk.green(
-      "Validated classes"
-    )} => ${chalk.bold(validatedClassesCount)}`
-  );
-  console.log(
-    `❌ [CamelCase]${chalk.gray("[class]")} ${chalk.red(
-      "Invalid classes"
-    )} => ${chalk.bold(invalidClassesCount)}`
-  );
+  if (currentConfig.options.silent) {
+    if (validatedClassesCount) {
+      logger.logChecking(
+        "check",
+        "camelCase",
+        "class",
+        `Validated clases => ${chalk.bold(validatedClassesCount)}`
+      );
+    }
+    if (invalidClassesCount) {
+      logger.logChecking(
+        "cross",
+        "camelCase",
+        "class",
+        `Invalid classes => ${chalk.bold(invalidClassesCount)}`
+      );
+    }
+  } else {
+    logger.logChecking(
+      "check",
+      "camelCase",
+      "class",
+      `Validated classes => ${chalk.bold(validatedClassesCount)}`
+    );
+    logger.logChecking(
+      "cross",
+      "camelCase",
+      "class",
+      `Invalid classes => ${chalk.bold(invalidClassesCount)}`
+    );
+  }
 
   if (invalidClassesCount && invalidClasses.length) {
     invalidClasses.forEach((classState) => {
@@ -242,16 +315,37 @@ export const checkCamelCaseForProperties = async (
     }
   }
 
-  console.log(
-    `✅ [CamelCase]${chalk.gray("[property]")} ${chalk.green(
-      "Validated properties"
-    )} => ${chalk.bold(validatedPropertiesCount)}`
-  );
-  console.log(
-    `❌ [CamelCase]${chalk.gray("[property]")} ${chalk.red(
-      "Invalid properties"
-    )} => ${chalk.bold(invalidPropertiesCount)}`
-  );
+  if (currentConfig.options.silent) {
+    if (validatedPropertiesCount) {
+      logger.logChecking(
+        "check",
+        "camelCase",
+        "property",
+        `Validated properties => ${chalk.bold(validatedPropertiesCount)}`
+      );
+    }
+    if (invalidPropertiesCount) {
+      logger.logChecking(
+        "cross",
+        "camelCase",
+        "property",
+        `Invalid properties => ${chalk.bold(invalidPropertiesCount)}`
+      );
+    }
+  } else {
+    logger.logChecking(
+      "check",
+      "camelCase",
+      "property",
+      `Validated properties => ${chalk.bold(validatedPropertiesCount)}`
+    );
+    logger.logChecking(
+      "cross",
+      "camelCase",
+      "property",
+      `Invalid properties => ${chalk.bold(invalidPropertiesCount)}`
+    );
+  }
 
   if (invalidPropertiesCount && invalidProperties.length) {
     invalidProperties.forEach((propertyState) => {
@@ -300,16 +394,37 @@ export const checkCamelCaseForParameters = async (
     });
   }
 
-  console.log(
-    `✅ [CamelCase]${chalk.gray("[parameter]")} ${chalk.green(
-      "Validated parameters"
-    )} => ${chalk.bold(validatedParametersCount)}`
-  );
-  console.log(
-    `❌ [CamelCase]${chalk.gray("[parameter]")} ${chalk.red(
-      "Invalid parameters"
-    )} => ${chalk.bold(invalidParametersCount)}`
-  );
+  if (currentConfig.options.silent) {
+    if (validatedParametersCount) {
+      logger.logChecking(
+        "check",
+        "camelCase",
+        "parameter",
+        `Validated parameters => ${chalk.bold(validatedParametersCount)}`
+      );
+    }
+    if (invalidParametersCount) {
+      logger.logChecking(
+        "cross",
+        "camelCase",
+        "parameter",
+        `Invalid parameters => ${chalk.bold(invalidParametersCount)}`
+      );
+    }
+  } else {
+    logger.logChecking(
+      "check",
+      "camelCase",
+      "parameter",
+      `Validated parameters => ${chalk.bold(validatedParametersCount)}`
+    );
+    logger.logChecking(
+      "cross",
+      "camelCase",
+      "parameter",
+      `Invalid parameters => ${chalk.bold(invalidParametersCount)}`
+    );
+  }
 
   if (invalidParametersCount && invalidParameters.length) {
     invalidParameters.forEach((parameterState) => {
@@ -355,16 +470,37 @@ export const checkCamelCaseForTypes = async (
     }
   }
 
-  console.log(
-    `✅ [CamelCase]${chalk.gray("[type]")} ${chalk.green(
-      "Validated types"
-    )} => ${chalk.bold(validatedTypesCount)}`
-  );
-  console.log(
-    `❌ [CamelCase]${chalk.gray("[type]")} ${chalk.red(
-      "Invalid types"
-    )} => ${chalk.bold(invalidTypesCount)}`
-  );
+  if (currentConfig.options.silent) {
+    if (validatedTypesCount) {
+      logger.logChecking(
+        "check",
+        "camelCase",
+        "type",
+        `Validated types => ${chalk.bold(validatedTypesCount)}`
+      );
+    }
+    if (invalidTypesCount) {
+      logger.logChecking(
+        "cross",
+        "camelCase",
+        "type",
+        `Invalid types => ${chalk.bold(invalidTypesCount)}`
+      );
+    }
+  } else {
+    logger.logChecking(
+      "check",
+      "camelCase",
+      "type",
+      `Validated types => ${chalk.bold(validatedTypesCount)}`
+    );
+    logger.logChecking(
+      "cross",
+      "camelCase",
+      "type",
+      `Invalid types => ${chalk.bold(invalidTypesCount)}`
+    );
+  }
 
   if (invalidTypesCount && invalidTypes.length) {
     invalidTypes.forEach((typeState) => {
@@ -410,16 +546,37 @@ export const checkCamelCaseForInterfaces = async (
     }
   }
 
-  console.log(
-    `✅ [CamelCase]${chalk.gray("[interface]")} ${chalk.green(
-      "Validated interfaces"
-    )} => ${chalk.bold(validatedInterfacesCount)}`
-  );
-  console.log(
-    `❌ [CamelCase]${chalk.gray("[interface]")} ${chalk.red(
-      "Invalid interfaces"
-    )} => ${chalk.bold(invalidInterfacesCount)}`
-  );
+  if (currentConfig.options.silent) {
+    if (validatedInterfacesCount) {
+      logger.logChecking(
+        "check",
+        "camelCase",
+        "interface",
+        `Validated interfaces => ${chalk.bold(validatedInterfacesCount)}`
+      );
+    }
+    if (invalidInterfacesCount) {
+      logger.logChecking(
+        "cross",
+        "camelCase",
+        "interface",
+        `Invalid interfaces => ${chalk.bold(invalidInterfacesCount)}`
+      );
+    }
+  } else {
+    logger.logChecking(
+      "check",
+      "camelCase",
+      "interface",
+      `Validated interfaces => ${chalk.bold(validatedInterfacesCount)}`
+    );
+    logger.logChecking(
+      "cross",
+      "camelCase",
+      "interface",
+      `Invalid interfaces => ${chalk.bold(invalidInterfacesCount)}`
+    );
+  }
 
   if (invalidInterfacesCount && invalidInterfaces.length) {
     invalidInterfaces.forEach((interfaceState) => {
@@ -465,16 +622,37 @@ export const checkCamelCaseForEnums = async (
     }
   }
 
-  console.log(
-    `✅ [CamelCase]${chalk.gray("[enum]")} ${chalk.green(
-      "Validated enums"
-    )} => ${chalk.bold(validatedEnumsCount)}`
-  );
-  console.log(
-    `❌ [CamelCase]${chalk.gray("[enum]")} ${chalk.red(
-      "Invalid enums"
-    )} => ${chalk.bold(invalidEnumsCount)}`
-  );
+  if (currentConfig.options.silent) {
+    if (validatedEnumsCount) {
+      logger.logChecking(
+        "check",
+        "camelCase",
+        "enum",
+        `Validated enums => ${chalk.bold(validatedEnumsCount)}`
+      );
+    }
+    if (invalidEnumsCount) {
+      logger.logChecking(
+        "cross",
+        "camelCase",
+        "enum",
+        `Invalid enums => ${chalk.bold(invalidEnumsCount)}`
+      );
+    }
+  } else {
+    logger.logChecking(
+      "check",
+      "camelCase",
+      "enum",
+      `Validated enums => ${chalk.bold(validatedEnumsCount)}`
+    );
+    logger.logChecking(
+      "cross",
+      "camelCase",
+      "enum",
+      `Invalid enums => ${chalk.bold(invalidEnumsCount)}`
+    );
+  }
 
   if (invalidEnumsCount && invalidEnums.length) {
     invalidEnums.forEach((enumState) => {

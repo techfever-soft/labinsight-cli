@@ -1,6 +1,6 @@
 {
   "name": "@techfever/labinsight-cli",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "A smart code analysis tool for all your projects",
   "main": "dist/bin/labinsight.js",
   "homepage": "https://lab-insight.web.app",
