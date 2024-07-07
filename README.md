@@ -2,14 +2,19 @@
 
 A static code analysis tool designed to provide insights and improve the quality of web applications during development.
 
+### [Homepage](https://lab-insight.web.app)
+
 ## Features
 
 - [x] Project structure exploration
 - [x] Automatic project type detection (Node.js, Angular, React, etc.)
 - [x] Custom configuration file '.labinsight'
 - [x] Basic code analysis for common errors
+  - [x] Casing
+    - [x] camelCase
+    - [x] PascalCase
+    - [ ] snake_case
   - [ ] Rules
-  - [ ] Casing
   - [ ] Options
   - [ ] Checking
   - [ ] Decorators
@@ -31,7 +36,14 @@ npm install -g @techfever/labinsight-cli
 ```bash
 labinsight init
 ```
-Replace init with your desired command or option. Run `labinsight --help` for more options.
+To initialize a new .labinsight file in your current working directory. 
+It automatically detects your project's configuration.
+
+```bash
+labinsight analyze
+```
+To check/validate your codebase in a single command.
+
 
 ## Contributing
 We welcome contributions to Labinsight ! To contribute:

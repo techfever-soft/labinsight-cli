@@ -22,7 +22,6 @@ export interface LabInsightConfig {
   linting: LabInsignhtProjectLinting;
 
   rules: {
-    variableCasing: LabInsightProjectCasing;
     maxLineLength: number;
     indentStyle: "space" | "tab";
     indentSize: number;
@@ -30,9 +29,21 @@ export interface LabInsightConfig {
     enforceSemicolons: boolean;
   };
 
+  casing: {
+    variableCasing: LabInsightProjectCasing;
+    parameterCasing: LabInsightProjectCasing;
+    propertyCasing: LabInsightProjectCasing;
+    methodCasing: LabInsightProjectCasing;
+    classCasing: LabInsightProjectCasing;
+    typeCasing: LabInsightProjectCasing;
+    interfaceCasing: LabInsightProjectCasing;
+    enumCasing: LabInsightProjectCasing;
+  }
+
   options: {
     jsDoc: boolean;
     strictMode: boolean;
+    noImplicitAny: boolean;
     noConsoleLog: boolean;
     noDebugger: boolean;
     noUnusedVariables: boolean;
@@ -46,15 +57,4 @@ export interface LabInsightConfig {
     propertyDecorators: boolean;
     parameterDecorators: boolean;
   };
-
-  checking: {
-    checkMethodNames: boolean;
-    checkPropertyNames: boolean;
-    checkParameterNames: boolean;
-    checkClassNames: boolean;
-    checkInterfaceNames: boolean;
-    checkEnumNames: boolean;
-    checkFunctionNames: boolean;
-    checkVariableNames: boolean;
-  }
 }

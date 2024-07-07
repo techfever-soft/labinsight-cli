@@ -10,16 +10,26 @@
   "distFolder": "dist",
   "linting": "eslint",
   "rules": {
-    "variableCasing": "camelCase",
     "maxLineLength": 120,
     "indentStyle": "space",
     "indentSize": 2,
     "allowTrailingSpaces": false,
     "enforceSemicolons": true
   },
+  "casing": {
+    "variableCasing": "camelCase",
+    "parameterCasing": "camelCase",
+    "propertyCasing": "camelCase",
+    "methodCasing": "camelCase",
+    "typeCasing": "pascalCase",
+    "classCasing": "pascalCase",
+    "interfaceCasing": "pascalCase",
+    "enumCasing": "pascalCase"
+  },
   "options": {
     "jsDoc": true,
     "strictMode": true,
+    "noImplicitAny": true,
     "noConsoleLog": true,
     "noDebugger": true,
     "noUnusedVariables": true,
@@ -31,15 +41,5 @@
     "methodDecorators": true,
     "propertyDecorators": true,
     "parameterDecorators": true
-  },
-  "checking": {
-    "checkMethodNames": true,
-    "checkPropertyNames": true,
-    "checkParameterNames": true,
-    "checkClassNames": true,
-    "checkInterfaceNames": true,
-    "checkEnumNames": true,
-    "checkFunctionNames": true,
-    "checkVariableNames": true
   }
 }

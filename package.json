@@ -1,8 +1,9 @@
 {
   "name": "@techfever/labinsight-cli",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A smart code analysis tool for all your projects",
   "main": "dist/bin/labinsight.js",
+  "homepage": "https://lab-insight.web.app",
   "scripts": {
     "build": "tsc",
     "start": "npm run build && node dist/bin/labinsight.js",

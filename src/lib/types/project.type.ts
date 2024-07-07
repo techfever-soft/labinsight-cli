@@ -13,4 +13,4 @@ export type LabInsightProjectEngine = "none" | "webpack" | "vite";
 
 export type LabInsignhtProjectLinting = "eslint" | "prettier" | "none";
 
-export type LabInsightProjectCasing = "camelCase" | "snake_case";
+export type LabInsightProjectCasing = "camelCase" | "pascalCase" | "snake_case";

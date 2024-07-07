@@ -76,7 +76,6 @@ export class LabInsightDetector {
           linting: "eslint",
 
           rules: {
-            variableCasing: "camelCase",
             maxLineLength: 120,
             indentStyle: "space",
             indentSize: 2,
@@ -84,10 +83,22 @@ export class LabInsightDetector {
             enforceSemicolons: true,
           },
 
+          casing: {
+            variableCasing: "camelCase",
+            parameterCasing: "camelCase",
+            propertyCasing: "camelCase",
+            methodCasing: "camelCase",
+            classCasing: "pascalCase",
+            typeCasing: "pascalCase",
+            interfaceCasing: "pascalCase",
+            enumCasing: "pascalCase",
+          },
+
           options: {
             jsDoc: true,
             strictMode: true,
             noConsoleLog: true,
+            noImplicitAny: true,
             noDebugger: true,
             noUnusedVariables: true,
             noUnusedImports: true,
@@ -99,17 +110,6 @@ export class LabInsightDetector {
             methodDecorators: true,
             propertyDecorators: true,
             parameterDecorators: true,
-          },
-
-          checking: {
-            checkMethodNames: true,
-            checkPropertyNames: true,
-            checkParameterNames: true,
-            checkClassNames: true,
-            checkInterfaceNames: true,
-            checkEnumNames: true,
-            checkFunctionNames: true,
-            checkVariableNames: true,
           },
         });
       } else {
@@ -128,7 +128,6 @@ export class LabInsightDetector {
           linting: "eslint",
 
           rules: {
-            variableCasing: "camelCase",
             maxLineLength: 120,
             indentStyle: "space",
             indentSize: 2,
@@ -136,9 +135,21 @@ export class LabInsightDetector {
             enforceSemicolons: true,
           },
 
+          casing: {
+            variableCasing: "camelCase",
+            parameterCasing: "camelCase",
+            propertyCasing: "camelCase",
+            methodCasing: "camelCase",
+            classCasing: "pascalCase",
+            typeCasing: "pascalCase",
+            interfaceCasing: "pascalCase",
+            enumCasing: "pascalCase",
+          },
+
           options: {
             jsDoc: true,
             strictMode: true,
+            noImplicitAny: true,
             noConsoleLog: true,
             noDebugger: true,
             noUnusedVariables: true,
@@ -151,17 +162,6 @@ export class LabInsightDetector {
             methodDecorators: true,
             propertyDecorators: true,
             parameterDecorators: true,
-          },
-
-          checking: {
-            checkMethodNames: true,
-            checkPropertyNames: true,
-            checkParameterNames: true,
-            checkClassNames: true,
-            checkInterfaceNames: true,
-            checkEnumNames: true,
-            checkFunctionNames: true,
-            checkVariableNames: true,
           },
         });
       }

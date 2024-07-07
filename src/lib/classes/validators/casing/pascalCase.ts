@@ -1,11 +1,11 @@
 import chalk from "chalk";
 
 /**
- * Checks if the variables are in camelCase
+ * Checks if the variables are in PascalCase
  * @param filePath string
  * @param fileContent string
  */
-export const checkCamelCaseForVariables = async (
+export const checkPascalCaseForVariables = async (
   filePath: string,
   fileContent: string
 ): Promise<void> => {
@@ -20,7 +20,7 @@ export const checkCamelCaseForVariables = async (
   if (variables && variables.length) {
     for (const variable of variables) {
       const variableName = variable.split(" ")[1];
-      if (!variableName.match(/^[a-z][a-zA-Z0-9]*$/)) {
+      if (!variableName.match(/^[A-Z][a-zA-Z0-9]*$/)) {
         const lines = fileContent.split("\n");
         const lineNumber = lines.findIndex((line) => line.includes(variable));
         invalidVariables.push({
@@ -34,12 +34,12 @@ export const checkCamelCaseForVariables = async (
     }
 
     console.log(
-      `✅ [CamelCase]${chalk.gray("[variable]")} ${chalk.green(
+      `✅ [PascalCase]${chalk.gray("[variable]")} ${chalk.green(
         "Validated variables"
       )} => ${chalk.bold(validatedVariablesCount)}`
     );
     console.log(
-      `❌ [CamelCase]${chalk.gray("[variable]")} ${chalk.red(
+      `❌ [PascalCase]${chalk.gray("[variable]")} ${chalk.red(
         "Invalid variables"
       )} => ${chalk.bold(invalidVariablesCount)}`
     );
@@ -58,11 +58,11 @@ export const checkCamelCaseForVariables = async (
 };
 
 /**
- * Checks if the functions are in camelCase
+ * Checks if the functions are in PascalCase
  * @param filePath string
  * @param fileContent string
  */
-export const checkCamelCaseForFunctions = async (
+export const checkPascalCaseForFunctions = async (
   filePath: string,
   fileContent: string
 ) => {
@@ -71,7 +71,6 @@ export const checkCamelCaseForFunctions = async (
 
   let invalidFunctions: any[] = [];
 
-  // Regular expressions to detect function names
   const detectNamedFunctions = /function\s+([a-zA-Z0-9_]+)\s*\(/g;
   const detectArrowFunctions =
     /(?:const|let|var)\s+([a-zA-Z0-9_]+)\s*=\s*\(.*?\)\s*=>/g;
@@ -80,10 +79,9 @@ export const checkCamelCaseForFunctions = async (
 
   let match: any;
 
-  // Detect named functions
   while ((match = detectNamedFunctions.exec(fileContent)) !== null) {
     const functionName = match[1];
-    if (!functionName.match(/^[a-z][a-zA-Z0-9]*$/)) {
+    if (!functionName.match(/^[A-Z][a-zA-Z0-9]*$/)) {
       const lines = fileContent.split("\n");
       const lineNumber = lines.findIndex((line) => line.includes(match[0]));
       invalidFunctions.push({
@@ -97,10 +95,9 @@ export const checkCamelCaseForFunctions = async (
     }
   }
 
-  // Detect arrow functions
   while ((match = detectArrowFunctions.exec(fileContent)) !== null) {
     const functionName = match[1];
-    if (!functionName.match(/^[a-z][a-zA-Z0-9]*$/)) {
+    if (!functionName.match(/^[A-Z][a-zA-Z0-9]*$/)) {
       const lines = fileContent.split("\n");
       const lineNumber = lines.findIndex((line) => line.includes(match[0]));
       invalidFunctions.push({
@@ -114,10 +111,9 @@ export const checkCamelCaseForFunctions = async (
     }
   }
 
-  // Detect exported functions
   while ((match = detectExportedFunctions.exec(fileContent)) !== null) {
     const functionName = match[1];
-    if (!functionName.match(/^[a-z][a-zA-Z0-9]*$/)) {
+    if (!functionName.match(/^[A-Z][a-zA-Z0-9]*$/)) {
       const lines = fileContent.split("\n");
       const lineNumber = lines.findIndex((line) => line.includes(match[0]));
       invalidFunctions.push({
@@ -132,12 +128,12 @@ export const checkCamelCaseForFunctions = async (
   }
 
   console.log(
-    `✅ [CamelCase]${chalk.gray("[function]")} ${chalk.green(
+    `✅ [PascalCase]${chalk.gray("[function]")} ${chalk.green(
       "Validated functions"
     )} => ${chalk.bold(validatedFunctionsCount)}`
   );
   console.log(
-    `❌ [CamelCase]${chalk.gray("[function]")} ${chalk.red(
+    `❌ [PascalCase]${chalk.gray("[function]")} ${chalk.red(
       "Invalid functions"
     )} => ${chalk.bold(invalidFunctionsCount)}`
   );
@@ -157,7 +153,7 @@ export const checkCamelCaseForFunctions = async (
   }
 };
 
-export const checkCamelCaseForClasses = async (
+export const checkPascalCaseForClasses = async (
   filePath: string,
   fileContent: string
 ) => {
@@ -172,7 +168,7 @@ export const checkCamelCaseForClasses = async (
 
   while ((match = detectClasses.exec(fileContent)) !== null) {
     const className = match[1];
-    if (!className.match(/^[a-z][a-zA-Z0-9]*$/)) {
+    if (!className.match(/^[A-Z][a-zA-Z0-9]*$/)) {
       const lines = fileContent.split("\n");
       const lineNumber = lines.findIndex((line) => line.includes(match[0]));
       invalidClasses.push({
@@ -187,12 +183,12 @@ export const checkCamelCaseForClasses = async (
   }
 
   console.log(
-    `✅ [CamelCase]${chalk.gray("[class]")} ${chalk.green(
+    `✅ [PascalCase]${chalk.gray("[class]")} ${chalk.green(
       "Validated classes"
     )} => ${chalk.bold(validatedClassesCount)}`
   );
   console.log(
-    `❌ [CamelCase]${chalk.gray("[class]")} ${chalk.red(
+    `❌ [PascalCase]${chalk.gray("[class]")} ${chalk.red(
       "Invalid classes"
     )} => ${chalk.bold(invalidClassesCount)}`
   );
@@ -212,7 +208,7 @@ export const checkCamelCaseForClasses = async (
   }
 };
 
-export const checkCamelCaseForProperties = async (
+export const checkPascalCaseForProperties = async (
   filePath: string,
   fileContent: string
 ) => {
@@ -222,13 +218,13 @@ export const checkCamelCaseForProperties = async (
   let invalidProperties: any[] = [];
 
   const detectProperties =
-    /(private|protected|public)\s+([a-zA-Z0-9_]+)\s*(?::\s*[a-zA-Z0-9_]+)?\s*=\s*[^;]*;/g;
+    /(?:private|protected|public)?\s*([a-zA-Z0-9_]+)\s*(?::\s*[a-zA-Z0-9_]+)?\s*=\s*[^;]*;/g;
 
   let match: any;
 
   while ((match = detectProperties.exec(fileContent)) !== null) {
     const propertyName = match[1];
-    if (!propertyName.match(/^[a-z][a-zA-Z0-9]*$/)) {
+    if (!propertyName.match(/^[A-Z][a-zA-Z0-9]*$/)) {
       const lines = fileContent.split("\n");
       const lineNumber = lines.findIndex((line) => line.includes(match[0]));
       invalidProperties.push({
@@ -243,12 +239,12 @@ export const checkCamelCaseForProperties = async (
   }
 
   console.log(
-    `✅ [CamelCase]${chalk.gray("[property]")} ${chalk.green(
+    `✅ [PascalCase]${chalk.gray("[property]")} ${chalk.green(
       "Validated properties"
     )} => ${chalk.bold(validatedPropertiesCount)}`
   );
   console.log(
-    `❌ [CamelCase]${chalk.gray("[property]")} ${chalk.red(
+    `❌ [PascalCase]${chalk.gray("[property]")} ${chalk.red(
       "Invalid properties"
     )} => ${chalk.bold(invalidPropertiesCount)}`
   );
@@ -268,7 +264,7 @@ export const checkCamelCaseForProperties = async (
   }
 };
 
-export const checkCamelCaseForParameters = async (
+export const checkPascalCaseForParameters = async (
   filePath: string,
   fileContent: string
 ) => {
@@ -277,36 +273,41 @@ export const checkCamelCaseForParameters = async (
 
   let invalidParameters: any[] = [];
 
-  const detectParameters =
-    /function\s+[a-zA-Z0-9_]+\s*\(\s*([a-zA-Z0-9_]+)\s*(?:,\s*[a-zA-Z0-9_]+)*\s*\)\s*{/g;
+  const detectParameters = /(?:function\s+.*?\(|\((.*?)\)\s*=>)/g;
 
   let match: any;
 
   while ((match = detectParameters.exec(fileContent)) !== null) {
-    const parameters = match[1].split(",").map((param: any) => param.trim());
-    parameters.forEach((param: any) => {
-      if (!param.match(/^[a-z][a-zA-Z0-9]*$/)) {
-        const lines = fileContent.split("\n");
-        const lineNumber = lines.findIndex((line) => line.includes(match[0]));
-        invalidParameters.push({
-          name: param,
-          pathLine: filePath + ":" + (lineNumber + 1),
-          type: "parameter",
-        });
-        invalidParametersCount++;
-      } else {
-        validatedParametersCount++;
+    const parameterList = match[1];
+    if (parameterList) {
+      const parameters = parameterList
+        .split(",")
+        .map((param: any) => param.trim());
+      for (const parameter of parameters) {
+        const parameterName = parameter.split(":")[0].trim();
+        if (!parameterName.match(/^[A-Z][a-zA-Z0-9]*$/)) {
+          const lines = fileContent.split("\n");
+          const lineNumber = lines.findIndex((line) => line.includes(match[0]));
+          invalidParameters.push({
+            name: parameterName,
+            pathLine: filePath + ":" + (lineNumber + 1),
+            type: "parameter",
+          });
+          invalidParametersCount++;
+        } else {
+          validatedParametersCount++;
+        }
       }
-    });
+    }
   }
 
   console.log(
-    `✅ [CamelCase]${chalk.gray("[parameter]")} ${chalk.green(
+    `✅ [PascalCase]${chalk.gray("[parameter]")} ${chalk.green(
       "Validated parameters"
     )} => ${chalk.bold(validatedParametersCount)}`
   );
   console.log(
-    `❌ [CamelCase]${chalk.gray("[parameter]")} ${chalk.red(
+    `❌ [PascalCase]${chalk.gray("[parameter]")} ${chalk.red(
       "Invalid parameters"
     )} => ${chalk.bold(invalidParametersCount)}`
   );
@@ -326,22 +327,22 @@ export const checkCamelCaseForParameters = async (
   }
 };
 
-export const checkCamelCaseForTypes = async (
+export const checkPascalCaseForTypes = async (
   filePath: string,
-  fileContent: string
+  fileContent: string,
 ) => {
   let validatedTypesCount = 0;
   let invalidTypesCount = 0;
 
   let invalidTypes: any[] = [];
 
-  const detectTypes = /type\s+([a-zA-Z0-9_]+)\s*=\s*[^;]*;/g;
+  const detectTypes = /type\s+([a-zA-Z0-9_]+)\s*/g;
 
   let match: any;
 
   while ((match = detectTypes.exec(fileContent)) !== null) {
     const typeName = match[1];
-    if (!typeName.match(/^[a-z][a-zA-Z0-9]*$/)) {
+    if (!typeName.match(/^[A-Z][a-zA-Z0-9]*$/)) {
       const lines = fileContent.split("\n");
       const lineNumber = lines.findIndex((line) => line.includes(match[0]));
       invalidTypes.push({
@@ -356,12 +357,12 @@ export const checkCamelCaseForTypes = async (
   }
 
   console.log(
-    `✅ [CamelCase]${chalk.gray("[type]")} ${chalk.green(
+    `✅ [PascalCase]${chalk.gray("[type]")} ${chalk.green(
       "Validated types"
     )} => ${chalk.bold(validatedTypesCount)}`
   );
   console.log(
-    `❌ [CamelCase]${chalk.gray("[type]")} ${chalk.red(
+    `❌ [PascalCase]${chalk.gray("[type]")} ${chalk.red(
       "Invalid types"
     )} => ${chalk.bold(invalidTypesCount)}`
   );
@@ -379,24 +380,24 @@ export const checkCamelCaseForTypes = async (
       );
     });
   }
-};
+}
 
-export const checkCamelCaseForInterfaces = async (
+export const checkPascalCaseForInterfaces = async (
   filePath: string,
   fileContent: string
-): Promise<void> => {
+) => {
   let validatedInterfacesCount = 0;
   let invalidInterfacesCount = 0;
 
   let invalidInterfaces: any[] = [];
 
-  const detectInterfaces = /interface\s+([a-zA-Z0-9_]+)\s*{/g;
+  const detectInterfaces = /interface\s+([a-zA-Z0-9_]+)\s*/g;
 
   let match: any;
 
   while ((match = detectInterfaces.exec(fileContent)) !== null) {
     const interfaceName = match[1];
-    if (!interfaceName.match(/^[a-z][a-zA-Z0-9]*$/)) {
+    if (!interfaceName.match(/^[A-Z][a-zA-Z0-9]*$/)) {
       const lines = fileContent.split("\n");
       const lineNumber = lines.findIndex((line) => line.includes(match[0]));
       invalidInterfaces.push({
@@ -411,12 +412,12 @@ export const checkCamelCaseForInterfaces = async (
   }
 
   console.log(
-    `✅ [CamelCase]${chalk.gray("[interface]")} ${chalk.green(
+    `✅ [PascalCase]${chalk.gray("[interface]")} ${chalk.green(
       "Validated interfaces"
     )} => ${chalk.bold(validatedInterfacesCount)}`
   );
   console.log(
-    `❌ [CamelCase]${chalk.gray("[interface]")} ${chalk.red(
+    `❌ [PascalCase]${chalk.gray("[interface]")} ${chalk.red(
       "Invalid interfaces"
     )} => ${chalk.bold(invalidInterfacesCount)}`
   );
@@ -436,22 +437,22 @@ export const checkCamelCaseForInterfaces = async (
   }
 };
 
-export const checkCamelCaseForEnums = async (
+export const checkPascalCaseForEnums = async (
   filePath: string,
   fileContent: string
-): Promise<void> => {
+) => {
   let validatedEnumsCount = 0;
   let invalidEnumsCount = 0;
 
   let invalidEnums: any[] = [];
 
-  const detectEnums = /enum\s+([a-zA-Z0-9_]+)\s*{/g;
+  const detectEnums = /enum\s+([a-zA-Z0-9_]+)\s*/g;
 
   let match: any;
 
   while ((match = detectEnums.exec(fileContent)) !== null) {
     const enumName = match[1];
-    if (!enumName.match(/^[a-z][a-zA-Z0-9]*$/)) {
+    if (!enumName.match(/^[A-Z][a-zA-Z0-9]*$/)) {
       const lines = fileContent.split("\n");
       const lineNumber = lines.findIndex((line) => line.includes(match[0]));
       invalidEnums.push({
@@ -466,12 +467,12 @@ export const checkCamelCaseForEnums = async (
   }
 
   console.log(
-    `✅ [CamelCase]${chalk.gray("[enum]")} ${chalk.green(
+    `✅ [PascalCase]${chalk.gray("[enum]")} ${chalk.green(
       "Validated enums"
     )} => ${chalk.bold(validatedEnumsCount)}`
   );
   console.log(
-    `❌ [CamelCase]${chalk.gray("[enum]")} ${chalk.red(
+    `❌ [PascalCase]${chalk.gray("[enum]")} ${chalk.red(
       "Invalid enums"
     )} => ${chalk.bold(invalidEnumsCount)}`
   );
