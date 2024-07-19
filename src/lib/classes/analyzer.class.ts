@@ -26,6 +26,7 @@ import {
 import { LabInsightConfig } from "../interfaces/config.interface";
 import { LabInsightLogger } from "./logger.class";
 import chalk from "chalk";
+import { checkNoAny } from "./validators/options/noAny";
 import fs from "fs";
 import path from "path";
 
@@ -219,12 +220,15 @@ export class LabInsightAnalyzer {
          */
         // await checkJsDoc(filePath, fileContent, labInsightConfig.options.jsDoc);
         // await checkStrictMode(filePath, fileContent, labInsightConfig.options.strictMode);
-        // await checkNoImplicitAny(filePath, fileContent, labInsightConfig.options.noImplicitAny);
         // await checkNoConsoleLog(filePath, fileContent, labInsightConfig.options.noConsoleLog);
         // await checkNoDebugger(filePath, fileContent, labInsightConfig.options.noDebugger);
         // await checkNoUnusedVariables(filePath, fileContent, labInsightConfig.options.noUnusedVariables);
         // await checkNoUnusedImports(filePath, fileContent, labInsightConfig.options.noUnusedImports);
         // await checkNoVar(filePath, fileContent, labInsightConfig.options.noVar);
+
+        if (labInsightConfig.options.noAny) {
+          await checkNoAny(filePath, fileContent);
+        }
       }
 
       console.log(" ");
