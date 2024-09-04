@@ -33,7 +33,16 @@ import path from "path";
 const logger = new LabInsightLogger();
 
 export class LabInsightAnalyzer {
-  public ignoredDirectories = ["node_modules", ".git", "dist"];
+  public ignoredDirectories = [
+    "node_modules",
+    ".git",
+    "dist",
+    "build",
+    "out",
+    "temp",
+    "tmp",
+    // ... TODO: Add more ignored directories
+  ];
 
   constructor() {}
 
@@ -46,6 +55,7 @@ export class LabInsightAnalyzer {
 
     const cwd = process.cwd();
     await this.analyzeDirectory(cwd);
+    await this.logResults();
   }
 
   /**
@@ -281,9 +291,18 @@ export class LabInsightAnalyzer {
 
     if (fileType === "unknown") {
       const fileContentLength = fileContent.length;
-      // TODO: Detect the file type with the a random slice of content
+      // TODO: Detect the file type with the a random slice of the content
     }
 
     return { fileType, isSourceCode };
+  }
+
+  private logResults() {
+    logger.log("success", "Basic analysis completed !");
+
+    logger.log(
+      "info",
+      "Results will be displayed here : " + chalk.italic("TODO")
+    );
   }
 }
