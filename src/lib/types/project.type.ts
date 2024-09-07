@@ -5,12 +5,17 @@ export type LabInsightProjectType =
   | "vue"
   | "angular"
   | "svelte"
-  | "web-components"
+  | "lit-element"
+  | "stencil"
   | "static"
   | "other";
 
 export type LabInsightProjectEngine = "none" | "webpack" | "vite";
 
-export type LabInsignhtProjectLinting = "eslint" | "prettier" | "none";
+export type LabInsignhtProjectLinting = "eslint" | "prettier" | "both" | "none";
 
-export type LabInsightProjectCasing = "camelCase" | "pascalCase" | "snake_case";
+export type LabInsightProjectCasing =
+  | "camelCase"
+  | "pascalCase"
+  | "snake_case"
+  | "kebab-case";

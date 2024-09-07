@@ -1,6 +1,6 @@
 {
   "name": "@techfever/labinsight-cli",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "A smart code analysis tool for all your projects",
   "main": "dist/bin/labinsight.js",
   "homepage": "https://lab-insight.web.app",
@@ -25,10 +25,22 @@
   "author": "D-C-MATE",
   "license": "ISC",
   "dependencies": {
+    "@inquirer/prompts": "^5.1.2",
+    "@types/axios": "^0.9.36",
     "@types/commander": "^2.12.2",
     "@types/node": "^20.14.10",
+    "@types/open": "^6.1.0",
+    "axios": "^1.7.7",
     "chalk": "^4.1.2",
-    "ora": "^5.4.1",
-    "@inquirer/prompts": "5.1.2"
+    "firebase": "^10.13.1",
+    "open": "^10.1.0",
+    "ora": "^5.4.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.9.1",
+    "@types/eslint": "^9.6.1",
+    "eslint": "^9.9.1",
+    "globals": "^15.9.0",
+    "typescript-eslint": "^8.4.0"
   }
 }

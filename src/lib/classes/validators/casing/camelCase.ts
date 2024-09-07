@@ -1,4 +1,3 @@
-import { LabInsightConfig } from "../../../interfaces/config.interface";
 import { LabInsightCore } from "../../core.class";
 import { LabInsightLogger } from "../../logger.class";
 import chalk from "chalk";
@@ -16,11 +15,11 @@ const currentConfig = core.getConfig();
 export const checkCamelCaseForVariables = async (
   filePath: string,
   fileContent: string
-): Promise<void> => {
+): Promise<{ valid: number; invalid: number }> => {
   let validatedVariablesCount = 0;
   let invalidVariablesCount = 0;
 
-  let invalidVariables: any[] = [];
+  const invalidVariables: any[] = [];
 
   const detectVariables = /(?:let|const|var)\s+([a-zA-Z0-9_]+)(?:\s*=\s*.*?;)/g;
   const variables = fileContent.match(detectVariables);
@@ -41,49 +40,18 @@ export const checkCamelCaseForVariables = async (
       }
     }
 
-    if (currentConfig.options.silent) {
-      if (validatedVariablesCount) {
-        logger.logChecking(
-          "check",
-          "camelCase",
-          "variable",
-          `Validated variables => ${chalk.bold(validatedVariablesCount)}`
-        );
-      }
-      if (invalidVariablesCount) {
-        logger.logChecking(
-          "cross",
-          "camelCase",
-          "variable",
-          `Invalid variables => ${chalk.bold(invalidVariablesCount)}`
-        );
-      }
-    } else {
-      logger.logChecking(
-        "check",
-        "camelCase",
-        "variable",
-        `Validated variables => ${chalk.bold(validatedVariablesCount)}`
-      );
-      logger.logChecking(
-        "cross",
-        "camelCase",
-        "variable",
-        `Invalid variables => ${chalk.bold(invalidVariablesCount)}`
-      );
-    }
-
-    if (invalidVariablesCount && invalidVariables.length) {
-      invalidVariables.forEach((variableState) => {
-        console.log(
-          " └── ⚠️  " +
-            chalk.bold(variableState.name) +
-            chalk.grey(" at ") +
-            chalk.italic(variableState.pathLine)
-        );
-      });
-    }
+    logResults(
+      validatedVariablesCount,
+      invalidVariablesCount,
+      "variable",
+      invalidVariables
+    );
   }
+
+  return {
+    valid: validatedVariablesCount,
+    invalid: invalidVariablesCount,
+  };
 };
 
 /**
@@ -94,13 +62,12 @@ export const checkCamelCaseForVariables = async (
 export const checkCamelCaseForFunctions = async (
   filePath: string,
   fileContent: string
-) => {
+): Promise<{ valid: number; invalid: number }> => {
   let validatedFunctionsCount = 0;
   let invalidFunctionsCount = 0;
 
-  let invalidFunctions: any[] = [];
+  const invalidFunctions: any[] = [];
 
-  // Regular expressions to detect function names
   const detectNamedFunctions = /function\s+([a-zA-Z0-9_]+)\s*\(/g;
   const detectArrowFunctions =
     /(?:const|let|var)\s+([a-zA-Z0-9_]+)\s*=\s*\(.*?\)\s*=>/g;
@@ -109,7 +76,6 @@ export const checkCamelCaseForFunctions = async (
 
   let match: any;
 
-  // Detect named functions
   while ((match = detectNamedFunctions.exec(fileContent)) !== null) {
     const functionName = match[1];
     if (!functionName.match(/^[a-z][a-zA-Z0-9]*$/)) {
@@ -126,7 +92,6 @@ export const checkCamelCaseForFunctions = async (
     }
   }
 
-  // Detect arrow functions
   while ((match = detectArrowFunctions.exec(fileContent)) !== null) {
     const functionName = match[1];
     if (!functionName.match(/^[a-z][a-zA-Z0-9]*$/)) {
@@ -143,7 +108,6 @@ export const checkCamelCaseForFunctions = async (
     }
   }
 
-  // Detect exported functions
   while ((match = detectExportedFunctions.exec(fileContent)) !== null) {
     const functionName = match[1];
     if (!functionName.match(/^[a-z][a-zA-Z0-9]*$/)) {
@@ -160,63 +124,32 @@ export const checkCamelCaseForFunctions = async (
     }
   }
 
-  if (currentConfig.options.silent) {
-    if (validatedFunctionsCount) {
-      logger.logChecking(
-        "check",
-        "camelCase",
-        "method",
-        `Validated methods => ${chalk.bold(validatedFunctionsCount)}`
-      );
-    }
-    if (invalidFunctionsCount) {
-      logger.logChecking(
-        "cross",
-        "camelCase",
-        "method",
-        `Invalid methods => ${chalk.bold(invalidFunctionsCount)}`
-      );
-    }
-  } else {
-    logger.logChecking(
-      "check",
-      "camelCase",
-      "method",
-      `Validated methods => ${chalk.bold(validatedFunctionsCount)}`
-    );
-    logger.logChecking(
-      "cross",
-      "camelCase",
-      "method",
-      `Invalid methods => ${chalk.bold(invalidFunctionsCount)}`
-    );
-  }
+  logResults(
+    validatedFunctionsCount,
+    invalidFunctionsCount,
+    "method",
+    invalidFunctions
+  );
 
-  if (invalidFunctionsCount && invalidFunctions.length) {
-    invalidFunctions.forEach((funcState) => {
-      console.log(
-        " └── ⚠️  " +
-          chalk.bold(funcState.name) +
-          chalk.grey(" at ") +
-          chalk.italic(funcState.pathLine) +
-          chalk.grey(" (") +
-          funcState.type +
-          chalk.grey(")")
-      );
-    });
-  }
+  return {
+    valid: validatedFunctionsCount,
+    invalid: invalidFunctionsCount,
+  };
 };
 
-// Do the same with logger.logChecking for the other functions
-
+/**
+ * Checks if the classes are in camelCase
+ * @param filePath string
+ * @param fileContent string
+ */
 export const checkCamelCaseForClasses = async (
   filePath: string,
   fileContent: string
-) => {
+): Promise<{ valid: number; invalid: number }> => {
   let validatedClassesCount = 0;
   let invalidClassesCount = 0;
 
-  let invalidClasses: any[] = [];
+  const invalidClasses: any[] = [];
 
   const detectClasses = /class\s+([a-zA-Z0-9_]+)\s*/g;
 
@@ -238,61 +171,32 @@ export const checkCamelCaseForClasses = async (
     }
   }
 
-  if (currentConfig.options.silent) {
-    if (validatedClassesCount) {
-      logger.logChecking(
-        "check",
-        "camelCase",
-        "class",
-        `Validated clases => ${chalk.bold(validatedClassesCount)}`
-      );
-    }
-    if (invalidClassesCount) {
-      logger.logChecking(
-        "cross",
-        "camelCase",
-        "class",
-        `Invalid classes => ${chalk.bold(invalidClassesCount)}`
-      );
-    }
-  } else {
-    logger.logChecking(
-      "check",
-      "camelCase",
-      "class",
-      `Validated classes => ${chalk.bold(validatedClassesCount)}`
-    );
-    logger.logChecking(
-      "cross",
-      "camelCase",
-      "class",
-      `Invalid classes => ${chalk.bold(invalidClassesCount)}`
-    );
-  }
+  logResults(
+    validatedClassesCount,
+    invalidClassesCount,
+    "class",
+    invalidClasses
+  );
 
-  if (invalidClassesCount && invalidClasses.length) {
-    invalidClasses.forEach((classState) => {
-      console.log(
-        " └── ⚠️  " +
-          chalk.bold(classState.name) +
-          chalk.grey(" at ") +
-          chalk.italic(classState.pathLine) +
-          chalk.grey(" (") +
-          classState.type +
-          chalk.grey(")")
-      );
-    });
-  }
+  return {
+    valid: validatedClassesCount,
+    invalid: invalidClassesCount,
+  };
 };
 
+/**
+ * Checks if the properties are in camelCase
+ * @param filePath string
+ * @param fileContent string
+ */
 export const checkCamelCaseForProperties = async (
   filePath: string,
   fileContent: string
-) => {
+): Promise<{ valid: number; invalid: number }> => {
   let validatedPropertiesCount = 0;
   let invalidPropertiesCount = 0;
 
-  let invalidProperties: any[] = [];
+  const invalidProperties: any[] = [];
 
   const detectProperties =
     /(private|protected|public)\s+([a-zA-Z0-9_]+)\s*(?::\s*[a-zA-Z0-9_]+)?\s*=\s*[^;]*;/g;
@@ -300,7 +204,7 @@ export const checkCamelCaseForProperties = async (
   let match: any;
 
   while ((match = detectProperties.exec(fileContent)) !== null) {
-    const propertyName = match[1];
+    const propertyName = match[2];
     if (!propertyName.match(/^[a-z][a-zA-Z0-9]*$/)) {
       const lines = fileContent.split("\n");
       const lineNumber = lines.findIndex((line) => line.includes(match[0]));
@@ -315,64 +219,35 @@ export const checkCamelCaseForProperties = async (
     }
   }
 
-  if (currentConfig.options.silent) {
-    if (validatedPropertiesCount) {
-      logger.logChecking(
-        "check",
-        "camelCase",
-        "property",
-        `Validated properties => ${chalk.bold(validatedPropertiesCount)}`
-      );
-    }
-    if (invalidPropertiesCount) {
-      logger.logChecking(
-        "cross",
-        "camelCase",
-        "property",
-        `Invalid properties => ${chalk.bold(invalidPropertiesCount)}`
-      );
-    }
-  } else {
-    logger.logChecking(
-      "check",
-      "camelCase",
-      "property",
-      `Validated properties => ${chalk.bold(validatedPropertiesCount)}`
-    );
-    logger.logChecking(
-      "cross",
-      "camelCase",
-      "property",
-      `Invalid properties => ${chalk.bold(invalidPropertiesCount)}`
-    );
-  }
+  logResults(
+    validatedPropertiesCount,
+    invalidPropertiesCount,
+    "property",
+    invalidProperties
+  );
 
-  if (invalidPropertiesCount && invalidProperties.length) {
-    invalidProperties.forEach((propertyState) => {
-      console.log(
-        " └── ⚠️  " +
-          chalk.bold(propertyState.name) +
-          chalk.grey(" at ") +
-          chalk.italic(propertyState.pathLine) +
-          chalk.grey(" (") +
-          propertyState.type +
-          chalk.grey(")")
-      );
-    });
-  }
+  return {
+    valid: validatedPropertiesCount,
+    invalid: invalidPropertiesCount,
+  };
 };
 
+/**
+ * Checks if the parameters are in camelCase
+ * @param filePath string
+ * @param fileContent string
+ */
 export const checkCamelCaseForParameters = async (
   filePath: string,
   fileContent: string
-) => {
+): Promise<{ valid: number; invalid: number }> => {
   let validatedParametersCount = 0;
   let invalidParametersCount = 0;
 
-  let invalidParameters: any[] = [];
+  const invalidParameters: any[] = [];
 
   const detectParameters =
-    /function\s+[a-zA-Z0-9_]+\s*\(\s*([a-zA-Z0-9_]+)\s*(?:,\s*[a-zA-Z0-9_]+)*\s*\)\s*{/g;
+    /function\s+[a-zA-Z0-9_]+\s*\(\s*([a-zA-Z0-9_,\s]*)\s*\)\s*{/g;
 
   let match: any;
 
@@ -394,63 +269,34 @@ export const checkCamelCaseForParameters = async (
     });
   }
 
-  if (currentConfig.options.silent) {
-    if (validatedParametersCount) {
-      logger.logChecking(
-        "check",
-        "camelCase",
-        "parameter",
-        `Validated parameters => ${chalk.bold(validatedParametersCount)}`
-      );
-    }
-    if (invalidParametersCount) {
-      logger.logChecking(
-        "cross",
-        "camelCase",
-        "parameter",
-        `Invalid parameters => ${chalk.bold(invalidParametersCount)}`
-      );
-    }
-  } else {
-    logger.logChecking(
-      "check",
-      "camelCase",
-      "parameter",
-      `Validated parameters => ${chalk.bold(validatedParametersCount)}`
-    );
-    logger.logChecking(
-      "cross",
-      "camelCase",
-      "parameter",
-      `Invalid parameters => ${chalk.bold(invalidParametersCount)}`
-    );
-  }
+  logResults(
+    validatedParametersCount,
+    invalidParametersCount,
+    "parameter",
+    invalidParameters
+  );
 
-  if (invalidParametersCount && invalidParameters.length) {
-    invalidParameters.forEach((parameterState) => {
-      console.log(
-        " └── ⚠️  " +
-          chalk.bold(parameterState.name) +
-          chalk.grey(" at ") +
-          chalk.italic(parameterState.pathLine) +
-          chalk.grey(" (") +
-          parameterState.type +
-          chalk.grey(")")
-      );
-    });
-  }
+  return {
+    valid: validatedParametersCount,
+    invalid: invalidParametersCount,
+  };
 };
 
+/**
+ * Checks if the types are in camelCase
+ * @param filePath string
+ * @param fileContent string
+ */
 export const checkCamelCaseForTypes = async (
   filePath: string,
   fileContent: string
-) => {
+): Promise<{ valid: number; invalid: number }> => {
   let validatedTypesCount = 0;
   let invalidTypesCount = 0;
 
-  let invalidTypes: any[] = [];
+  const invalidTypes: any[] = [];
 
-  const detectTypes = /type\s+([a-zA-Z0-9_]+)\s*=\s*[^;]*;/g;
+  const detectTypes = /type\s+([a-zA-Z0-9_]+)\s*=\s*/g;
 
   let match: any;
 
@@ -470,61 +316,27 @@ export const checkCamelCaseForTypes = async (
     }
   }
 
-  if (currentConfig.options.silent) {
-    if (validatedTypesCount) {
-      logger.logChecking(
-        "check",
-        "camelCase",
-        "type",
-        `Validated types => ${chalk.bold(validatedTypesCount)}`
-      );
-    }
-    if (invalidTypesCount) {
-      logger.logChecking(
-        "cross",
-        "camelCase",
-        "type",
-        `Invalid types => ${chalk.bold(invalidTypesCount)}`
-      );
-    }
-  } else {
-    logger.logChecking(
-      "check",
-      "camelCase",
-      "type",
-      `Validated types => ${chalk.bold(validatedTypesCount)}`
-    );
-    logger.logChecking(
-      "cross",
-      "camelCase",
-      "type",
-      `Invalid types => ${chalk.bold(invalidTypesCount)}`
-    );
-  }
+  logResults(validatedTypesCount, invalidTypesCount, "type", invalidTypes);
 
-  if (invalidTypesCount && invalidTypes.length) {
-    invalidTypes.forEach((typeState) => {
-      console.log(
-        " └── ⚠️  " +
-          chalk.bold(typeState.name) +
-          chalk.grey(" at ") +
-          chalk.italic(typeState.pathLine) +
-          chalk.grey(" (") +
-          typeState.type +
-          chalk.grey(")")
-      );
-    });
-  }
+  return {
+    valid: validatedTypesCount,
+    invalid: invalidTypesCount,
+  };
 };
 
+/**
+ * Checks if the interfaces are in camelCase
+ * @param filePath string
+ * @param fileContent string
+ */
 export const checkCamelCaseForInterfaces = async (
   filePath: string,
   fileContent: string
-): Promise<void> => {
+): Promise<{ valid: number; invalid: number }> => {
   let validatedInterfacesCount = 0;
   let invalidInterfacesCount = 0;
 
-  let invalidInterfaces: any[] = [];
+  const invalidInterfaces: any[] = [];
 
   const detectInterfaces = /interface\s+([a-zA-Z0-9_]+)\s*{/g;
 
@@ -546,61 +358,32 @@ export const checkCamelCaseForInterfaces = async (
     }
   }
 
-  if (currentConfig.options.silent) {
-    if (validatedInterfacesCount) {
-      logger.logChecking(
-        "check",
-        "camelCase",
-        "interface",
-        `Validated interfaces => ${chalk.bold(validatedInterfacesCount)}`
-      );
-    }
-    if (invalidInterfacesCount) {
-      logger.logChecking(
-        "cross",
-        "camelCase",
-        "interface",
-        `Invalid interfaces => ${chalk.bold(invalidInterfacesCount)}`
-      );
-    }
-  } else {
-    logger.logChecking(
-      "check",
-      "camelCase",
-      "interface",
-      `Validated interfaces => ${chalk.bold(validatedInterfacesCount)}`
-    );
-    logger.logChecking(
-      "cross",
-      "camelCase",
-      "interface",
-      `Invalid interfaces => ${chalk.bold(invalidInterfacesCount)}`
-    );
-  }
+  logResults(
+    validatedInterfacesCount,
+    invalidInterfacesCount,
+    "interface",
+    invalidInterfaces
+  );
 
-  if (invalidInterfacesCount && invalidInterfaces.length) {
-    invalidInterfaces.forEach((interfaceState) => {
-      console.log(
-        " └── ⚠️  " +
-          chalk.bold(interfaceState.name) +
-          chalk.grey(" at ") +
-          chalk.italic(interfaceState.pathLine) +
-          chalk.grey(" (") +
-          interfaceState.type +
-          chalk.grey(")")
-      );
-    });
-  }
+  return {
+    valid: validatedInterfacesCount,
+    invalid: invalidInterfacesCount,
+  };
 };
 
+/**
+ * Checks if the enums are in camelCase
+ * @param filePath string
+ * @param fileContent string
+ */
 export const checkCamelCaseForEnums = async (
   filePath: string,
   fileContent: string
-): Promise<void> => {
+): Promise<{ valid: number; invalid: number }> => {
   let validatedEnumsCount = 0;
   let invalidEnumsCount = 0;
 
-  let invalidEnums: any[] = [];
+  const invalidEnums: any[] = [];
 
   const detectEnums = /enum\s+([a-zA-Z0-9_]+)\s*{/g;
 
@@ -622,49 +405,50 @@ export const checkCamelCaseForEnums = async (
     }
   }
 
-  if (currentConfig.options.silent) {
-    if (validatedEnumsCount) {
-      logger.logChecking(
-        "check",
-        "camelCase",
-        "enum",
-        `Validated enums => ${chalk.bold(validatedEnumsCount)}`
-      );
-    }
-    if (invalidEnumsCount) {
-      logger.logChecking(
-        "cross",
-        "camelCase",
-        "enum",
-        `Invalid enums => ${chalk.bold(invalidEnumsCount)}`
-      );
-    }
-  } else {
-    logger.logChecking(
-      "check",
-      "camelCase",
-      "enum",
-      `Validated enums => ${chalk.bold(validatedEnumsCount)}`
+  logResults(validatedEnumsCount, invalidEnumsCount, "enum", invalidEnums);
+
+  return {
+    valid: validatedEnumsCount,
+    invalid: invalidEnumsCount,
+  };
+};
+
+/**
+ * Logs the results of the validation process
+ * @param validCount number
+ * @param invalidCount number
+ * @param type string
+ * @param invalidItems array
+ */
+const logResults = (
+  validCount: number,
+  invalidCount: number,
+  type: string,
+  invalidItems: any[]
+) => {
+  if (invalidItems.length > 0) {
+    logger.log(
+      "warning",
+      `${chalk.red(invalidItems.length + " invalid " + type + "(s)")}`
     );
-    logger.logChecking(
-      "cross",
-      "camelCase",
-      "enum",
-      `Invalid enums => ${chalk.bold(invalidEnumsCount)}`
+    invalidItems.forEach((item) => {
+      logger.log(
+        "error",
+        `${chalk.red("Invalid " + type + ": ")} ${chalk.bold(item.name)} in ${
+          item.pathLine
+        }`
+      );
+    });
+  }
+
+  if (validCount > 0) {
+    logger.log(
+      "success",
+      `${chalk.green(validCount + " valid " + type + "(s)")}`
     );
   }
 
-  if (invalidEnumsCount && invalidEnums.length) {
-    invalidEnums.forEach((enumState) => {
-      console.log(
-        " └── ⚠️  " +
-          chalk.bold(enumState.name) +
-          chalk.grey(" at ") +
-          chalk.italic(enumState.pathLine) +
-          chalk.grey(" (") +
-          enumState.type +
-          chalk.grey(")")
-      );
-    });
+  if (invalidCount === 0) {
+    logger.log("success", `${chalk.green("All " + type + "(s) are valid.")}`);
   }
 };

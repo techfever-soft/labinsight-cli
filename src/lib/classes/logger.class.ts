@@ -25,6 +25,12 @@ export class LabInsightLogger {
     );
   }
 
+  public spacing(count: number = 1) {
+    for (let i = 0; i < count; i++) {
+      console.log(" ");
+    }
+  }
+
   public logChecking(
     type: LabInsightLogCheckType,
     testType: LabInsightLogCheckTestType,

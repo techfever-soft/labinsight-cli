@@ -18,19 +18,20 @@ import {
   checkPascalCaseForTypes,
   checkPascalCaseForVariables,
 } from "./validators/casing/pascalCase";
-import {
-  doFileContainsIgnoreCasingDecorator,
-  ignoreCasing,
-} from "../decorators/ignore.decorator";
+import { doFileContainsIgnoreCasingDecorator } from "../decorators/ignore.decorator";
 
 import { LabInsightConfig } from "../interfaces/config.interface";
 import { LabInsightLogger } from "./logger.class";
 import chalk from "chalk";
-import { checkNoAny } from "./validators/options/noAny";
 import fs from "fs";
 import path from "path";
+import { ESLint } from "eslint";
+import { LabInsightDetector } from "./detector.class";
+import { LabInsightReporter } from "./reporter.class";
 
 const logger = new LabInsightLogger();
+const detector = new LabInsightDetector();
+const reporter = new LabInsightReporter();
 
 export class LabInsightAnalyzer {
   public ignoredDirectories = [
@@ -41,29 +42,97 @@ export class LabInsightAnalyzer {
     "out",
     "temp",
     "tmp",
-    // ... TODO: Add more ignored directories
+    "reports",
+    "logs",
   ];
+  public ignoredFiles = [
+    ".DS_Store",
+    ".gitignore",
+    ".npmignore",
+    "package.json",
+    "package-lock.json",
+    "yarn.lock",
+    "tsconfig.json",
+  ];
+
+  private eslintResults: any[] = [];
+  private casingResults: any[] = [];
 
   constructor() {}
 
-  /**
-   * Performs a basic analysis on the current working directory
-   * @returns Promise<void>
-   */
   public async basicAnalysis(): Promise<void> {
     logger.log("info", "Starting basic analysis...");
 
     const cwd = process.cwd();
-    await this.analyzeDirectory(cwd);
-    await this.logResults();
+    const results = await this.analyzeDirectory(cwd);
+
+    logger.spacing();
+    logger.log("success", "Basic analysis completed!");
+
+    logger.log("info", `Validated variables: ${results.validatedVariables}`);
+    logger.log("info", `Invalid variables: ${results.invalidVariables}`);
+
+    logger.log("info", `Validated functions: ${results.validatedFunctions}`);
+    logger.log("info", `Invalid functions: ${results.invalidFunctions}`);
+
+    logger.log("info", `Validated classes: ${results.validatedClasses}`);
+    logger.log("info", `Invalid classes: ${results.invalidClasses}`);
+
+    logger.log("info", `Validated properties: ${results.validatedProperties}`);
+    logger.log("info", `Invalid properties: ${results.invalidProperties}`);
+
+    logger.log("info", `Validated parameters: ${results.validatedParameters}`);
+    logger.log("info", `Invalid parameters: ${results.invalidParameters}`);
+
+    logger.log("info", `Validated types: ${results.validatedTypes}`);
+    logger.log("info", `Invalid types: ${results.invalidTypes}`);
+
+    logger.log("info", `Validated interfaces: ${results.validatedInterfaces}`);
+    logger.log("info", `Invalid interfaces: ${results.invalidInterfaces}`);
+
+    logger.log("info", `Validated enums: ${results.validatedEnums}`);
+    logger.log("info", `Invalid enums: ${results.invalidEnums}`);
+
+    logger.spacing();
   }
 
-  /**
-   * Analyze the directory and his childrens
-   * @param directoryPath string
-   * @returns Promise<void>
-   */
-  private async analyzeDirectory(directoryPath: string): Promise<void> {
+  private async analyzeDirectory(directoryPath: string): Promise<{
+    validatedVariables: number;
+    invalidVariables: number;
+    validatedFunctions: number;
+    invalidFunctions: number;
+    validatedClasses: number;
+    invalidClasses: number;
+    validatedProperties: number;
+    invalidProperties: number;
+    validatedParameters: number;
+    invalidParameters: number;
+    validatedTypes: number;
+    invalidTypes: number;
+    validatedInterfaces: number;
+    invalidInterfaces: number;
+    validatedEnums: number;
+    invalidEnums: number;
+  }> {
+    let results = {
+      validatedVariables: 0,
+      invalidVariables: 0,
+      validatedFunctions: 0,
+      invalidFunctions: 0,
+      validatedClasses: 0,
+      invalidClasses: 0,
+      validatedProperties: 0,
+      invalidProperties: 0,
+      validatedParameters: 0,
+      invalidParameters: 0,
+      validatedTypes: 0,
+      invalidTypes: 0,
+      validatedInterfaces: 0,
+      invalidInterfaces: 0,
+      validatedEnums: 0,
+      invalidEnums: 0,
+    };
+
     try {
       const files = fs.readdirSync(directoryPath);
       for (const file of files) {
@@ -74,11 +143,11 @@ export class LabInsightAnalyzer {
           const stats = fs.statSync(filePath);
 
           if (stats.isDirectory()) {
-            // Recursive call if it's a directory
-            await this.analyzeDirectory(filePath);
+            const subdirResults = await this.analyzeDirectory(filePath);
+            results = this.aggregateResults(results, subdirResults);
           } else if (stats.isFile()) {
-            // Analyze file if it's a regular file
-            await this.analyzeFile(filePath);
+            const fileResults = await this.analyzeFile(filePath);
+            results = this.aggregateResults(results, fileResults);
           }
         }
       }
@@ -88,221 +157,336 @@ export class LabInsightAnalyzer {
         `Error analyzing directory ${directoryPath}: ${error}`
       );
     }
+
+    return results;
   }
 
-  /**
-   * Removes comments and strings from a file content
-   * @param fileContent string
-   * @returns Promise<string>
-   */
-  private async removeCommentsAndStrings(fileContent: string): Promise<string> {
-    const commentPattern = /\/\/.*|\/\*[^]*?\*\//g;
-    const stringPattern = /(['"`])(?:(?=(\\?))\2.)*?\1/g;
-    return fileContent.replace(commentPattern, "").replace(stringPattern, "");
-  }
+  private async analyzeFile(filePath: string): Promise<{
+    validatedVariables: number;
+    invalidVariables: number;
+    validatedFunctions: number;
+    invalidFunctions: number;
+    validatedClasses: number;
+    invalidClasses: number;
+    validatedProperties: number;
+    invalidProperties: number;
+    validatedParameters: number;
+    invalidParameters: number;
+    validatedTypes: number;
+    invalidTypes: number;
+    validatedInterfaces: number;
+    invalidInterfaces: number;
+    validatedEnums: number;
+    invalidEnums: number;
+  }> {
+    if (this.ignoredFiles.includes(path.basename(filePath))) {
+      return {
+        validatedVariables: 0,
+        invalidVariables: 0,
+        validatedFunctions: 0,
+        invalidFunctions: 0,
+        validatedClasses: 0,
+        invalidClasses: 0,
+        validatedProperties: 0,
+        invalidProperties: 0,
+        validatedParameters: 0,
+        invalidParameters: 0,
+        validatedTypes: 0,
+        invalidTypes: 0,
+        validatedInterfaces: 0,
+        invalidInterfaces: 0,
+        validatedEnums: 0,
+        invalidEnums: 0,
+      };
+    }
 
-  /**
-   * Analyzes a file with the given path
-   * @param filePath string
-   * @returns Promise<void>
-   */
-  private async analyzeFile(filePath: string): Promise<void> {
     try {
-      const rawfileContent = fs.readFileSync(filePath, "utf-8");
+      const eslint = new ESLint({
+        baseConfig: {
+          rules: {
+            "no-unused-vars": "error",
+            "no-console": "error",
+            "no-debugger": "error",
+          },
+        },
+      });
+      const results = await eslint.lintFiles(filePath);
+
+      results.forEach((result) => {
+        logger.log(
+          "info",
+          `File: ${chalk.bold(result.filePath)} - Errors: ${
+            result.errorCount
+          }, Warnings: ${result.warningCount}`
+        );
+        result.messages.forEach((msg) => {
+          logger.log(
+            "info",
+            `  ${msg.message} (line ${msg.line}, column ${msg.column})`
+          );
+        });
+
+        this.eslintResults.push({
+          filePath: result.filePath,
+          errorCount: result.errorCount,
+          warningCount: result.warningCount,
+          messages: result.messages,
+        });
+      });
+
+      const fileContent = fs.readFileSync(filePath, "utf-8");
+      const hasIgnoreCasingDecorator =
+        doFileContainsIgnoreCasingDecorator(fileContent);
+
       const labInsightConfig: LabInsightConfig = JSON.parse(
         fs.readFileSync(path.join(".labinsight"), "utf-8")
       );
 
-      const fileContent = await this.removeCommentsAndStrings(rawfileContent);
-      const hasIgnoreCasingDecorator =
-        doFileContainsIgnoreCasingDecorator(fileContent);
+      if (!hasIgnoreCasingDecorator) {
+        const casingResults = await this.validateCasing(
+          filePath,
+          fileContent,
+          labInsightConfig
+        );
 
-      // Perform various analyses
-      const { fileType, isSourceCode } = await this.detectFileType(
+        this.casingResults.push({
+          filePath,
+          results: casingResults,
+        });
+
+        // logger.log(
+        //   "info",
+        //   `Casing results for ${chalk.bold(filePath)} - Valid: ${
+        //     casingResults.validated
+        //   }, Invalid: ${casingResults.invalid}`
+        // );
+
+        return casingResults;
+      } else {
+        logger.log(
+          "warning",
+          "Ignoring case-checking for the file: " + filePath
+        );
+
+        return {
+          validatedVariables: 0,
+          invalidVariables: 0,
+          validatedFunctions: 0,
+          invalidFunctions: 0,
+          validatedClasses: 0,
+          invalidClasses: 0,
+          validatedProperties: 0,
+          invalidProperties: 0,
+          validatedParameters: 0,
+          invalidParameters: 0,
+          validatedTypes: 0,
+          invalidTypes: 0,
+          validatedInterfaces: 0,
+          invalidInterfaces: 0,
+          validatedEnums: 0,
+          invalidEnums: 0,
+        };
+      }
+    } catch (error) {
+      logger.log("error", `Error analyzing file ${filePath}: ${error}`);
+      return {
+        validatedVariables: 0,
+        invalidVariables: 0,
+        validatedFunctions: 0,
+        invalidFunctions: 0,
+        validatedClasses: 0,
+        invalidClasses: 0,
+        validatedProperties: 0,
+        invalidProperties: 0,
+        validatedParameters: 0,
+        invalidParameters: 0,
+        validatedTypes: 0,
+        invalidTypes: 0,
+        validatedInterfaces: 0,
+        invalidInterfaces: 0,
+        validatedEnums: 0,
+        invalidEnums: 0,
+      };
+    }
+  }
+
+  private async validateCasing(
+    filePath: string,
+    fileContent: string,
+    config: LabInsightConfig
+  ): Promise<{
+    validatedVariables: number;
+    invalidVariables: number;
+    validatedFunctions: number;
+    invalidFunctions: number;
+    validatedClasses: number;
+    invalidClasses: number;
+    validatedProperties: number;
+    invalidProperties: number;
+    validatedParameters: number;
+    invalidParameters: number;
+    validatedTypes: number;
+    invalidTypes: number;
+    validatedInterfaces: number;
+    invalidInterfaces: number;
+    validatedEnums: number;
+    invalidEnums: number;
+  }> {
+    let validatedVariables = 0;
+    let invalidVariables = 0;
+    let validatedFunctions = 0;
+    let invalidFunctions = 0;
+    let validatedClasses = 0;
+    let invalidClasses = 0;
+    let validatedProperties = 0;
+    let invalidProperties = 0;
+    let validatedParameters = 0;
+    let invalidParameters = 0;
+    let validatedTypes = 0;
+    let invalidTypes = 0;
+    let validatedInterfaces = 0;
+    let invalidInterfaces = 0;
+    let validatedEnums = 0;
+    let invalidEnums = 0;
+
+    if (config.casing.variableCasing === "camelCase") {
+      const { valid, invalid } = await checkCamelCaseForVariables(
         filePath,
         fileContent
       );
+      validatedVariables += valid;
+      invalidVariables += invalid;
+    }
 
-      logger.log(
-        "info",
-        `Analyzing file : ${chalk.gray(chalk.italic(filePath))} [${fileType}]`
+    if (config.casing.methodCasing === "camelCase") {
+      const { valid, invalid } = await checkCamelCaseForFunctions(
+        filePath,
+        fileContent
       );
-
-      if (isSourceCode) {
-        /**
-         * SECTION: Casing analysis
-         */
-
-        if (!hasIgnoreCasingDecorator) {
-          //
-          // camelCase
-          //
-          if (labInsightConfig.casing.variableCasing === "camelCase") {
-            await checkCamelCaseForVariables(filePath, fileContent);
-          }
-          if (labInsightConfig.casing.methodCasing === "camelCase") {
-            await checkCamelCaseForFunctions(filePath, fileContent);
-          }
-          if (labInsightConfig.casing.classCasing === "camelCase") {
-            await checkCamelCaseForClasses(filePath, fileContent);
-          }
-          if (labInsightConfig.casing.propertyCasing === "camelCase") {
-            await checkCamelCaseForProperties(filePath, fileContent);
-          }
-          if (labInsightConfig.casing.parameterCasing === "camelCase") {
-            await checkCamelCaseForParameters(filePath, fileContent);
-          }
-          if (labInsightConfig.casing.typeCasing === "camelCase") {
-            await checkCamelCaseForTypes(filePath, fileContent);
-          }
-          if (labInsightConfig.casing.interfaceCasing === "camelCase") {
-            await checkCamelCaseForInterfaces(filePath, fileContent);
-          }
-          if (labInsightConfig.casing.enumCasing === "camelCase") {
-            await checkCamelCaseForEnums(filePath, fileContent);
-          }
-
-          //
-          // PascalCase
-          //
-          if (labInsightConfig.casing.variableCasing === "pascalCase") {
-            await checkPascalCaseForVariables(filePath, fileContent);
-          }
-          if (labInsightConfig.casing.methodCasing === "pascalCase") {
-            await checkPascalCaseForFunctions(filePath, fileContent);
-          }
-          if (labInsightConfig.casing.classCasing === "pascalCase") {
-            await checkPascalCaseForClasses(filePath, fileContent);
-          }
-          if (labInsightConfig.casing.propertyCasing === "pascalCase") {
-            await checkPascalCaseForProperties(filePath, fileContent);
-          }
-          if (labInsightConfig.casing.parameterCasing === "pascalCase") {
-            await checkPascalCaseForParameters(filePath, fileContent);
-          }
-          if (labInsightConfig.casing.typeCasing === "pascalCase") {
-            await checkPascalCaseForTypes(filePath, fileContent);
-          }
-          if (labInsightConfig.casing.interfaceCasing === "pascalCase") {
-            await checkPascalCaseForInterfaces(filePath, fileContent);
-          }
-          if (labInsightConfig.casing.enumCasing === "pascalCase") {
-            await checkPascalCaseForEnums(filePath, fileContent);
-          }
-        } else {
-          logger.log(
-            "warning",
-            "Ignoring case-checking for the file : " + filePath
-          );
-        }
-
-        //
-        // snake_case
-        // TODO: Implement the snake_case validation
-        //
-        if (labInsightConfig.casing.variableCasing === "snake_case") {
-          // await checkSnakeCaseForVariables(filePath, fileContent);
-        }
-        if (labInsightConfig.casing.methodCasing === "snake_case") {
-          // await checkSnakeCaseForFunctions(filePath, fileContent);
-        }
-        if (labInsightConfig.casing.classCasing === "snake_case") {
-          // await checkSnakeCaseForClasses(filePath, fileContent);
-        }
-        if (labInsightConfig.casing.propertyCasing === "snake_case") {
-          // await checkSnakeCaseForProperties(filePath, fileContent);
-        }
-        if (labInsightConfig.casing.typeCasing === "snake_case") {
-          // await checkSnakeCaseForTypes(filePath, fileContent);
-        }
-        if (labInsightConfig.casing.parameterCasing === "snake_case") {
-          // await checkSnakeCaseForParameters(filePath, fileContent);
-        }
-        if (labInsightConfig.casing.interfaceCasing === "snake_case") {
-          // await checkSnakeCaseForInterfaces(filePath, fileContent);
-        }
-        if (labInsightConfig.casing.enumCasing === "snake_case") {
-          // await checkSnakeCaseForEnums(filePath, fileContent);
-        }
-
-        /**
-         * SECTION: Options analysis
-         */
-        // await checkJsDoc(filePath, fileContent, labInsightConfig.options.jsDoc);
-        // await checkStrictMode(filePath, fileContent, labInsightConfig.options.strictMode);
-        // await checkNoConsoleLog(filePath, fileContent, labInsightConfig.options.noConsoleLog);
-        // await checkNoDebugger(filePath, fileContent, labInsightConfig.options.noDebugger);
-        // await checkNoUnusedVariables(filePath, fileContent, labInsightConfig.options.noUnusedVariables);
-        // await checkNoUnusedImports(filePath, fileContent, labInsightConfig.options.noUnusedImports);
-        // await checkNoVar(filePath, fileContent, labInsightConfig.options.noVar);
-
-        if (labInsightConfig.options.noAny) {
-          await checkNoAny(filePath, fileContent);
-        }
-      }
-
-      console.log(" ");
-    } catch (error) {
-      logger.log("error", `Error analyzing file ${filePath}: ${error}`);
+      validatedFunctions += valid;
+      invalidFunctions += invalid;
     }
+
+    if (config.casing.classCasing === "camelCase") {
+      const { valid, invalid } = await checkCamelCaseForClasses(
+        filePath,
+        fileContent
+      );
+      validatedClasses += valid;
+      invalidClasses += invalid;
+    }
+
+    if (config.casing.propertyCasing === "camelCase") {
+      const { valid, invalid } = await checkCamelCaseForProperties(
+        filePath,
+        fileContent
+      );
+      validatedProperties += valid;
+      invalidProperties += invalid;
+    }
+
+    if (config.casing.parameterCasing === "camelCase") {
+      const { valid, invalid } = await checkCamelCaseForParameters(
+        filePath,
+        fileContent
+      );
+      validatedParameters += valid;
+      invalidParameters += invalid;
+    }
+
+    if (config.casing.typeCasing === "camelCase") {
+      const { valid, invalid } = await checkCamelCaseForTypes(
+        filePath,
+        fileContent
+      );
+      validatedTypes += valid;
+      invalidTypes += invalid;
+    }
+
+    if (config.casing.interfaceCasing === "camelCase") {
+      const { valid, invalid } = await checkCamelCaseForInterfaces(
+        filePath,
+        fileContent
+      );
+      validatedInterfaces += valid;
+      invalidInterfaces += invalid;
+    }
+
+    if (config.casing.enumCasing === "camelCase") {
+      const { valid, invalid } = await checkCamelCaseForEnums(
+        filePath,
+        fileContent
+      );
+      validatedEnums += valid;
+      invalidEnums += invalid;
+    }
+
+    return {
+      validatedVariables,
+      invalidVariables,
+      validatedFunctions,
+      invalidFunctions,
+      validatedClasses,
+      invalidClasses,
+      validatedProperties,
+      invalidProperties,
+      validatedParameters,
+      invalidParameters,
+      validatedTypes,
+      invalidTypes,
+      validatedInterfaces,
+      invalidInterfaces,
+      validatedEnums,
+      invalidEnums,
+    };
   }
 
-  /**
-   * Detects the file extension
-   * @param filePath string
-   * @param fileContent string
-   * @returns { fileType: string, isSourceCode: boolean }
-   */
-  private async detectFileType(
-    filePath: string,
-    fileContent: string
-  ): Promise<{ fileType: string; isSourceCode: boolean }> {
-    let fileType = "unknown";
-    let isSourceCode = false;
-
-    if (filePath.endsWith(".ts")) {
-      fileType = "typescript";
-      isSourceCode = true;
-    }
-    if (filePath.endsWith(".js")) {
-      fileType = "javascript";
-      isSourceCode = true;
-    }
-    if (filePath.endsWith(".html")) {
-      fileType = "html";
-      isSourceCode = true;
-    }
-    if (filePath.endsWith(".css")) {
-      fileType = "css";
-      isSourceCode = true;
-    }
-    if (filePath.endsWith(".md")) {
-      fileType = "markdown";
-      isSourceCode = false;
-    }
-    if (filePath.endsWith(".yaml") || filePath.endsWith(".yml")) {
-      fileType = "yaml";
-      isSourceCode = false;
-    }
-    if (filePath.endsWith(".json")) {
-      fileType = "json";
-      isSourceCode = false;
-    }
-
-    if (fileType === "unknown") {
-      const fileContentLength = fileContent.length;
-      // TODO: Detect the file type with the a random slice of the content
-    }
-
-    return { fileType, isSourceCode };
-  }
-
-  private logResults() {
-    logger.log("success", "Basic analysis completed !");
-
-    logger.log(
-      "info",
-      "Results will be displayed here : " + chalk.italic("TODO")
-    );
+  private aggregateResults(
+    results1: any,
+    results2: any
+  ): {
+    validatedVariables: number;
+    invalidVariables: number;
+    validatedFunctions: number;
+    invalidFunctions: number;
+    validatedClasses: number;
+    invalidClasses: number;
+    validatedProperties: number;
+    invalidProperties: number;
+    validatedParameters: number;
+    invalidParameters: number;
+    validatedTypes: number;
+    invalidTypes: number;
+    validatedInterfaces: number;
+    invalidInterfaces: number;
+    validatedEnums: number;
+    invalidEnums: number;
+  } {
+    return {
+      validatedVariables:
+        results1.validatedVariables + results2.validatedVariables,
+      invalidVariables: results1.invalidVariables + results2.invalidVariables,
+      validatedFunctions:
+        results1.validatedFunctions + results2.validatedFunctions,
+      invalidFunctions: results1.invalidFunctions + results2.invalidFunctions,
+      validatedClasses: results1.validatedClasses + results2.validatedClasses,
+      invalidClasses: results1.invalidClasses + results2.invalidClasses,
+      validatedProperties:
+        results1.validatedProperties + results2.validatedProperties,
+      invalidProperties:
+        results1.invalidProperties + results2.invalidProperties,
+      validatedParameters:
+        results1.validatedParameters + results2.validatedParameters,
+      invalidParameters:
+        results1.invalidParameters + results2.invalidParameters,
+      validatedTypes: results1.validatedTypes + results2.validatedTypes,
+      invalidTypes: results1.invalidTypes + results2.invalidTypes,
+      validatedInterfaces:
+        results1.validatedInterfaces + results2.validatedInterfaces,
+      invalidInterfaces:
+        results1.invalidInterfaces + results2.invalidInterfaces,
+      validatedEnums: results1.validatedEnums + results2.validatedEnums,
+      invalidEnums: results1.invalidEnums + results2.invalidEnums,
+    };
   }
 }

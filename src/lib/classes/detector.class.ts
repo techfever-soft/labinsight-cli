@@ -14,6 +14,56 @@ export class LabInsightDetector {
    */
 
   /**
+   * Detects the file extension
+   * @param filePath string
+   * @param fileContent string
+   * @returns { fileType: string, isSourceCode: boolean }
+   */
+  public async detectFileType(
+    filePath: string,
+    fileContent: string
+  ): Promise<{ fileType: string; isSourceCode: boolean }> {
+    let fileType = "unknown";
+    let isSourceCode = false;
+
+    if (filePath.endsWith(".ts")) {
+      fileType = "typescript";
+      isSourceCode = true;
+    }
+    if (filePath.endsWith(".js")) {
+      fileType = "javascript";
+      isSourceCode = true;
+    }
+    if (filePath.endsWith(".html")) {
+      fileType = "html";
+      isSourceCode = true;
+    }
+    if (filePath.endsWith(".css")) {
+      fileType = "css";
+      isSourceCode = true;
+    }
+    if (filePath.endsWith(".md")) {
+      fileType = "markdown";
+      isSourceCode = false;
+    }
+    if (filePath.endsWith(".yaml") || filePath.endsWith(".yml")) {
+      fileType = "yaml";
+      isSourceCode = false;
+    }
+    if (filePath.endsWith(".json")) {
+      fileType = "json";
+      isSourceCode = false;
+    }
+
+    if (fileType === "unknown") {
+      const fileContentLength = fileContent.length;
+      // TODO: Detect the file type with the a random slice of the content
+    }
+
+    return { fileType, isSourceCode };
+  }
+
+  /**
    * Automatically detect the project configuration
    * @returns Promise<LabInsightConfig>
    */
@@ -75,33 +125,14 @@ export class LabInsightDetector {
 
           linting: "eslint",
 
-          casing: {
-            variableCasing: "camelCase",
-            parameterCasing: "camelCase",
-            propertyCasing: "camelCase",
-            methodCasing: "camelCase",
-            classCasing: "pascalCase",
-            typeCasing: "pascalCase",
-            interfaceCasing: "pascalCase",
-            enumCasing: "pascalCase",
-          },
-
-          options: {
-            jsDoc: true,
-            silent: true,
-            strictMode: true,
-            noConsoleLog: true,
-            noAny: true,
-            noDebugger: true,
-            noUnusedVariables: true,
-            noUnusedImports: true,
-            noVar: true,
-          },
+          casing: {},
+          options: {},
+          decorators: {},
         });
       } else {
         resolve(<LabInsightConfig>{
           version: 1,
-          projectName: "labinsight",
+          projectName,
           projectType: "none",
           engine: "none",
           enviroment: "development",
@@ -111,84 +142,14 @@ export class LabInsightDetector {
           srcFolder: "src",
           distFolder: "dist",
 
-          linting: "eslint",
+          linting: "none",
 
-          casing: {
-            variableCasing: "camelCase",
-            parameterCasing: "camelCase",
-            propertyCasing: "camelCase",
-            methodCasing: "camelCase",
-            classCasing: "pascalCase",
-            typeCasing: "pascalCase",
-            interfaceCasing: "pascalCase",
-            enumCasing: "pascalCase",
-          },
-
-          options: {
-            jsDoc: true,
-            silent: true,
-            strictMode: true,
-            noAny: true,
-            noConsoleLog: true,
-            noDebugger: true,
-            noUnusedVariables: true,
-            noUnusedImports: true,
-            noVar: true,
-          },
+          casing: {},
+          options: {},
+          decorators: {},
         });
       }
     });
-  }
-
-  /**
-   * Explore the project root folder and print the content
-   * @returns Promise<void>
-   */
-  public async exploreProjectRoot(): Promise<void> {
-    const projectRootPath = process.cwd();
-
-    try {
-      const rootContents = await fs.promises.readdir(projectRootPath);
-      for (const item of rootContents) {
-        await this.scanFileOrFolderChildrens(item, 0);
-      }
-
-      console.log(" ");
-
-      console.log("Exploration of root folder succeed !");
-    } catch (error) {
-      console.error("Error when exploring root folder :", error);
-    }
-  }
-
-  private async scanFileOrFolderChildrens(
-    name: string,
-    depth: number
-  ): Promise<void> {
-    const itemPath = path.join(process.cwd(), name);
-
-    try {
-      const exists = fs.existsSync(itemPath);
-
-      if (!exists) {
-        return;
-      }
-
-      const stats = await fs.promises.stat(itemPath);
-      if (stats.isDirectory()) {
-        console.log(" ".repeat(depth * 2) + `└── 📁 ${name}`);
-        const subItems = await fs.promises.readdir(itemPath);
-        for (const subItem of subItems) {
-          await this.scanFileOrFolderChildrens(subItem, depth + 1);
-        }
-      } else if (stats.isFile()) {
-        console.log(" ".repeat(depth * 2) + `└── 📄 ${name}`);
-      } else {
-        console.log(" ".repeat(depth * 2) + `└── ${name} (unknown type)`);
-      }
-    } catch (error) {
-      console.error(`Error when reading : ${name} :`, error);
-    }
   }
 
   /**
