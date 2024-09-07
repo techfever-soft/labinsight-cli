@@ -18,6 +18,8 @@ export const analyze = async () => {
     ],
   });
 
+  // TODO: Implement the advanced analysis
+
   const reportType = await select({
     message: "Which type of report do you want to generate ?",
     choices: [

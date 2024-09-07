@@ -100,7 +100,15 @@ export class LabInsightDetector {
         if (this.doDependenciesIncludes(["vue"])) {
           projectType = "vue";
         }
-        // End detecting project config
+        if (this.doDependenciesIncludes(["svelte"])) {
+          projectType = "svelte";
+        }
+        if (this.doDependenciesIncludes(["lit-element"])) {
+          projectType = "lit-element";
+        }
+        if (this.doDependenciesIncludes(["@stencil/core"])) {
+          projectType = "stencil";
+        }
 
         // ANCHOR: Start detecting project engine
         if (this.doDependenciesIncludes(["webpack", "webpack-dev-server"])) {
@@ -109,7 +117,8 @@ export class LabInsightDetector {
         if (this.doDependenciesIncludes(["vite"])) {
           engine = "vite";
         }
-        // End detecting project engine
+
+        // TODO: Detect project engine
 
         return resolve(<LabInsightConfig>{
           version: 1,
@@ -125,9 +134,15 @@ export class LabInsightDetector {
 
           linting: "eslint",
 
-          casing: {},
-          options: {},
-          decorators: {},
+          casing: {
+            // TODO: Add the default casing
+          },
+          options: {
+            // TODO: Add the default options
+          },
+          decorators: {
+            // TODO: Add the default decorators
+          },
         });
       } else {
         resolve(<LabInsightConfig>{
@@ -144,9 +159,15 @@ export class LabInsightDetector {
 
           linting: "none",
 
-          casing: {},
-          options: {},
-          decorators: {},
+          casing: {
+            // TODO: Add the default casing
+          },
+          options: {
+            // TODO: Add the default options
+          },
+          decorators: {
+            // TODO: Add the default decorators
+          },
         });
       }
     });

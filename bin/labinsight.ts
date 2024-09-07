@@ -36,17 +36,17 @@ program
 /**
  * Login to the LabInsight account
  */
-program
-  .command("login")
-  .description("Login to your LabInsight account")
-  .action(login);
+// program
+//   .command("login")
+//   .description("Login to your LabInsight account")
+//   .action(login);
 
-/**
- * Logout from the LabInsight account
- */
-program
-  .command("logout")
-  .description("Logout from your LabInsight account")
-  .action(logout);
+// /**
+//  * Logout from the LabInsight account
+//  */
+// program
+//   .command("logout")
+//   .description("Logout from your LabInsight account")
+//   .action(logout);
 
 program.parse(process.argv);

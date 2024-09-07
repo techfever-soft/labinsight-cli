@@ -7,12 +7,12 @@ A static code analysis tool designed to provide insights and improve the quality
 ## Features (v0.1+)
 
 - [x] Project structure exploration
-- [x] Automatic project type detection (Node.js, Angular, React, etc.)
+- [x] Automatic project type detection (Node.js, Angular, Stencil, etc.)
 - [x] Custom configuration file '.labinsight'
 - [x] Basic code analysis for common errors
   - [x] Casing
     - [x] camelCase
-    - [x] PascalCase
+    - [ ] PascalCase
     - [ ] snake_case
   - [ ] Options
   - [x] Decorators (@IgnoreCasing)
